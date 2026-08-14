@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
+  "name": "will",
+  "description": "Will Gilpin's agent skills",
+  "owner": {
+    "name": "Will Gilpin",
+    "url": "https://github.com/wgilpin"
+  },
+  "plugins": [
+    {
+      "name": "sdlc",
+      "displayName": "Personal SDLC",
+      "source": "./",
+      "skills": ["./skills"],
+      "description": "One chain from idea to reviewed code: concept, explore, architect, phases, plan a phase, build an epic, review. Artifacts live in docs/sdlc/ and a state file tracks where you are.",
+      "author": {
+        "name": "Will Gilpin",
+        "url": "https://github.com/wgilpin"
+      },
+      "homepage": "https://github.com/wgilpin/sdlc",
+      "repository": "https://github.com/wgilpin/sdlc",
+      "license": "MIT",
+      "category": "productivity",
+      "keywords": [
+        "sdlc",
+        "planning",
+        "architecture",
+        "tdd",
+        "code-review",
+        "agentic-coding"
+      ]
+    }
+  ]
+}

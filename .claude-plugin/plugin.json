@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "sdlc",
+  "displayName": "Personal SDLC",
+  "version": "0.1.0",
+  "description": "One chain from idea to reviewed code: concept, explore, architect, phases, plan a phase, build an epic, review. Artifacts live in docs/sdlc/ and a state file tracks where you are.",
+  "author": {
+    "name": "Will Gilpin",
+    "url": "https://github.com/wgilpin"
+  },
+  "homepage": "https://github.com/wgilpin/sdlc",
+  "repository": "https://github.com/wgilpin/sdlc",
+  "license": "MIT",
+  "keywords": [
+    "sdlc",
+    "planning",
+    "architecture",
+    "tdd",
+    "code-review",
+    "agentic-coding"
+  ],
+  "skills": ["./skills"]
+}
