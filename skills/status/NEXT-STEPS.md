@@ -63,6 +63,11 @@ these. Do not list all of them.
   while.
 - **The parallel epic.** When `plan-phase` marked two epics independent, offer
   either one.
+- **The open issue.** `/sdlc:issue` when `issues.md` holds an issue that the
+  recommended step does not cover. Name the issue ID in the reason.
+- **The whole phase.** `/sdlc:loop-phase <phase>` when a phase is about to
+  start, or when epics are left in the current phase. It asks once, then runs
+  stages 5 to 8 to the end of the phase.
 
 Do not offer a step that its own preconditions block. Do not offer
 `/sdlc:build-epic` for an epic that no phase plan covers.

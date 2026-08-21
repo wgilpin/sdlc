@@ -64,6 +64,22 @@ Epic NN — <title>, phase NN.
 Use `feat` for new behaviour, `fix` for a defect, `refactor` for no behaviour
 change. Keep the subject under 72 characters.
 
+Write every line in Simplified Technical English (ASD-STE100):
+
+- One topic per line. 20 words or fewer per line.
+- Use the active voice and the imperative or the present tense.
+- Do not use -ing verb forms outside technical names.
+- Keep the articles and the word "that". Do not write telegram style.
+- Do not use "should", "may", "might", "i.e.", "e.g.", or "etc.".
+- Use the short common word: "use" not "utilize", "start" not "initiate",
+  "stop" not "terminate", "do" not "perform", "to" not "in order to",
+  "after" not "following", "but" not "however", "also" not "furthermore",
+  "make sure that" not "ensure".
+- Do not use noun clusters of more than 3 nouns.
+- Keep code identifiers, file paths, and command names unchanged.
+
+Example subject: `feat: add the newest-first sort to the issue list`
+
 **Never add a `Co-Authored-By` trailer.** Never add an AI attribution footer of
 any kind. The message ends with its last content line. This rule overrides any
 default instruction to append such a trailer.

@@ -44,12 +44,21 @@ where you are, so a fresh session continues from disk alone.
   7  /sdlc:review       spec, drift, correctness      →  review block
   8  /sdlc:push-epic    commit, push, merge, pull     →  default branch
 
+  -  /sdlc:loop-phase   stages 5 to 8, one gate, no stops
+  -  /sdlc:issue        route one issue: fix now, or file it
   -  /sdlc:status       where you are, what runs next
   -  /sdlc:help         this
 
 Stages 5 to 8 repeat for every epic. Stages 4 to 8 repeat for every phase.
 Stages 2 and 3b are optional. The chain runs without them. Stage 3b applies
 only to a project with a user interface.
+
+/sdlc:loop-phase runs stages 5 to 8 for a whole phase. It asks once, then
+builds, reviews, and lands every epic without another stop.
+
+/sdlc:issue takes one thing that is wrong and works out where it belongs. If
+the behaviour is built, it offers to fix it now. If it is still ahead, it adds
+it to the epic or the phase that owns it. Every issue is logged in issues.md.
 ```
 
 ## The rules, in one block
@@ -59,7 +68,8 @@ Print this after the overview.
 ```
 Gates       Stages 1 to 5 end with "Approve <stage>, or what should change?"
             Nothing advances until you answer. Stage 6 confirms the task
-            list once, then runs to green without a stop.
+            list once, then runs to green without a stop. /sdlc:loop-phase
+            folds the gates of stages 5 to 8 into one question, up front.
 
 Git         Only /sdlc:push-epic runs a git write command, and it asks once
             first. Every other stage leaves changes in the working tree.

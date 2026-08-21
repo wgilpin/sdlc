@@ -30,6 +30,8 @@ neither.
 | `/sdlc:build-epic` | 6 | Runs one epic red-green-refactor to green, on its own branch. |
 | `/sdlc:review` | 7 | Checks the diff against the epic, the concept, and the architecture. |
 | `/sdlc:push-epic` | 8 | Commits, pushes, merges into the default branch, pulls. |
+| `/sdlc:loop-phase` | 5–8 | Runs a whole phase in one go. One gate, then no stops. |
+| `/sdlc:issue` | — | Routes one issue: fix it now, or into the epic or phase that owns it. |
 | `/sdlc:status` | — | Says where you are and what runs next. |
 | `/sdlc:help` | — | Describes the chain, the rules, and one stage on request. |
 
@@ -80,6 +82,7 @@ docs/sdlc/
   architecture.md           stage 3, records the stack
   design.md                 stage 3b, tokens and surfaces, UI projects only
   phases.md                 stage 4, the ordered phase list
+  issues.md                 /sdlc:issue, the record of every issue raised
   phase-01-<slug>/
     phase.md                stage 5: goal, scope, done criteria
     test-plan.md            stage 5: how the phase gets proven
@@ -105,6 +108,24 @@ tell me what to change."** Nothing advances until you answer.
 
 Stage 6 is different. It confirms the task list once, then runs to green
 without a stop.
+
+## Running a whole phase
+
+`/sdlc:loop-phase 02` does stages 5 to 8 for one phase in a single run. It
+plans the phase, then builds, reviews, and lands every epic in order.
+
+It asks three things before it starts — a repository, a clean working tree, a
+green suite — and then one gate that shows the epics and warns that the run
+commits, pushes, and merges. That yes is the permission for every git write in
+the run. It covers that phase only.
+
+After the yes it takes its own recommendation at every step. It stops only when
+a rule forces it: a stuck test, a review that fails twice on one epic, a merge
+conflict, a red suite, a `docker` or migration command, or a contradiction with
+the architecture. It never deletes a branch and never softens a verdict to keep
+going.
+
+Run `/sdlc:loop-phase NN` again to pick up the epics that are left.
 
 ## How the chain asks
 

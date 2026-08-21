@@ -13,6 +13,7 @@ docs/sdlc/
   design.md                 stage 3b, only when the project has a UI
   design-kit/               stage 3b, only when pushed to Claude Design
   phases.md                 stage 4
+  issues.md                 /sdlc:issue, only once an issue is raised
   phase-01-<slug>/
     phase.md                stage 5
     test-plan.md            stage 5
@@ -210,6 +211,28 @@ no-permission.>
 ```
 
 Status does not live here. Status lives in `state.md`.
+
+## issues.md
+
+Written by `/sdlc:issue`. Absent until the first issue is raised.
+
+```markdown
+# Issues — <project name>
+
+One line per issue, newest last. Status is `open`, `scheduled`, `fixed`,
+or `dropped`. This file records issues. It never records stage status.
+
+## ISS-N — <the issue in one sentence>
+
+**Raised:** <YYYY-MM-DD>
+**Status:** open
+**Lands in:** <epic-NN-<slug> / phase NN / unplanned / fixed on <branch>>
+
+<Two lines at most. What is wrong, and how you know.>
+```
+
+An issue keeps its number for good. A closed issue stays in the file with a
+new status, never deleted.
 
 ## phase.md
 
