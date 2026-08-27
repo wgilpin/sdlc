@@ -46,6 +46,7 @@ where you are, so a fresh session continues from disk alone.
 
   -  /sdlc:loop-phase   stages 5 to 8, one gate, no stops
   -  /sdlc:issue        route one issue: fix now, or file it
+  -  /sdlc:respec       rewrite the spec, throw the code away
   -  /sdlc:status       where you are, what runs next
   -  /sdlc:help         this
 
@@ -59,6 +60,11 @@ builds, reviews, and lands every epic without another stop.
 /sdlc:issue takes one thing that is wrong and works out where it belongs. If
 the behaviour is built, it offers to fix it now. If it is still ahead, it adds
 it to the epic or the phase that owns it. Every issue is logged in issues.md.
+
+/sdlc:respec is for a problem bigger than an issue. It reads the artifacts, the
+code, and the session, then writes a fresh spec to rebuild from scratch. Scope
+is one fix, one epic, one phase, or the whole app. It writes to docs/sdlc-v2/
+and changes nothing under docs/sdlc/.
 ```
 
 ## The rules, in one block
@@ -106,6 +112,7 @@ docs/sdlc/
     test-plan.md            stage 5: how the phase gets proven
     epic-01-<slug>.md       stage 5 spec, stage 6 build note, stage 7 review
 docs/adr/NNNN-<slug>.md     decisions that are hard to reverse
+docs/sdlc-v2/               /sdlc:respec, a spec to rebuild from scratch
 ```
 
 One file per epic. That file holds the spec, the build note, and the review,

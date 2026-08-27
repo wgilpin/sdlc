@@ -17,8 +17,11 @@ Read `docs/sdlc/state.md`. Find the epic.
 
 Stop, and say why, when any of these hold:
 
-- The epic is `built`, not `reviewed`. Run `/sdlc:review` first. Unreviewed
-  code does not land.
+- The epic is `built`, not `reviewed`. Unreviewed code does not land. Do not
+  just refuse: end the message with **Review `epic-NN` now?** Reply `yes` to
+  run the three passes, or `no` to stop here. On a `yes`, do
+  [review](../review/SKILL.md) in full, then start this skill again from the
+  top. On a `no`, stop.
 - The epic is `blocked`. Fix the review findings first.
 - The epic is already `merged`. Say so and stop.
 - The directory is not a git repository.

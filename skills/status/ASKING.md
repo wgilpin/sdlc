@@ -86,3 +86,8 @@ Stage 6 confirms the task list once, then runs to green. Inside that run it
 does not ask. A blocked build stops and reports; it does not open a
 negotiation. The exceptions are the user's own rules: a `docker` command, a
 migration, or a database reset always asks, even mid-build.
+
+A green build then asks one last thing: **Review `epic-NN` now?** That question
+is the close of stage 6. Unreviewed code must not walk into stage 8, so the
+offer is a question, not a `Next` line. Inside `/sdlc:loop-phase` it does not
+run, because the loop gate covers it.

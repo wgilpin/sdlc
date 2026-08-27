@@ -49,6 +49,10 @@ Read `docs/sdlc/state.md`, then take the first row that matches.
 A stage the user has not approved always outranks a later stage. Never
 recommend skipping a gate.
 
+An epic that is `built` is the one case a skill asks instead of recommending.
+Stage 6 closes with **Review `epic-NN` now?**, and prints this block only after
+a `no`. See [ASKING.md](ASKING.md).
+
 ## The alternatives
 
 Under the recommendation, offer the branches that are genuinely open. Pick from
@@ -68,6 +72,12 @@ these. Do not list all of them.
 - **The whole phase.** `/sdlc:loop-phase <phase>` when a phase is about to
   start, or when epics are left in the current phase. It asks once, then runs
   stages 5 to 8 to the end of the phase.
+- **The rebuild.** `/sdlc:respec <scope>` when a review failed twice on one
+  epic, or when the build notes show the same deviation again and again. Say
+  that it writes a new spec and changes no existing file.
+
+`/sdlc:respec` never appears in the table above. A rebuild is never the
+automatic next step. Offer it only when the evidence names a shape problem.
 
 Do not offer a step that its own preconditions block. Do not offer
 `/sdlc:build-epic` for an epic that no phase plan covers.

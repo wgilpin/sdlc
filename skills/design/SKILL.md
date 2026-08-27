@@ -98,13 +98,32 @@ On yes:
    `mcp__stitch__create_design_system_from_design_md`. The design system comes
    from the tokens you just agreed, so every screen matches.
 3. `mcp__stitch__generate_screen_from_text` for each surface, one call per
-   screen, always with the `designSystem` id from step 2. Generation is slow.
-   Do not retry a timeout. Poll `mcp__stitch__get_screen` instead.
-4. Record the project id and the design system id in `design.md`, under
+   screen, always with the `designSystem` id from step 2. Keep each prompt to a
+   few sentences of plain prose in one paragraph. Long prompts with headings and
+   line breaks are rejected with "Request contains an invalid argument". That
+   error means the prompt is too long, not that it is malformed, so cut it down
+   rather than reformat it.
+4. Expect the call to time out. A timeout is the normal case, and the
+   generation almost always succeeded on the server. Do not retry it, and do not
+   tell the user the screen failed.
+5. Do not poll after a timeout. `mcp__stitch__get_screen` needs a screen id you
+   never received, and `mcp__stitch__list_screens` does not show a generation
+   that is still running — it can stay empty for several minutes after a call
+   that worked. An empty list is not evidence of failure, and a retry makes a
+   duplicate screen. Stop, tell the user which screens you asked for, and ask
+   them to confirm from the Stitch UI.
+6. Record the project id and the design system id in `design.md`, under
    `## Where the screens live`.
 
-Show the user the screens, then end the message with: **What do you want
-changed?** Name a screen and the change, or reply `none`.
+One call builds one screen. It does not chain. Stitch then offers follow-up
+suggestions, as `output_components` in the response and as clickable chips in
+the Stitch UI. When your calls time out you never see `output_components`, so
+you cannot pass the suggestions on. A user watching the Stitch UI can click the
+chips faster than you can issue calls. Offer them that choice instead of
+assuming you drive every screen.
+
+If a call did return, show the user those screens. Then end the message with:
+**What do you want changed?** Name a screen and the change, or reply `none`.
 
 Use `mcp__stitch__edit_screens` for a fix and `mcp__stitch__generate_variants`
 when the user wants options.

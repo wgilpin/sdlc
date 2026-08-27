@@ -32,6 +32,7 @@ neither.
 | `/sdlc:push-epic` | 8 | Commits, pushes, merges into the default branch, pulls. |
 | `/sdlc:loop-phase` | 5–8 | Runs a whole phase in one go. One gate, then no stops. |
 | `/sdlc:issue` | — | Routes one issue: fix it now, or into the epic or phase that owns it. |
+| `/sdlc:respec` | — | Writes a fresh spec to rebuild a fix, an epic, a phase, or the app. |
 | `/sdlc:status` | — | Says where you are and what runs next. |
 | `/sdlc:help` | — | Describes the chain, the rules, and one stage on request. |
 
@@ -88,6 +89,7 @@ docs/sdlc/
     test-plan.md            stage 5: how the phase gets proven
     epic-01-<slug>.md       stage 5 spec, stage 6 build note, stage 7 review
 docs/adr/NNNN-<slug>.md     decisions that are hard to reverse
+docs/sdlc-v2/               /sdlc:respec, a spec to rebuild from scratch
 ```
 
 One file per epic. That file holds the spec, the build note, and the review, in
@@ -127,6 +129,25 @@ going.
 
 Run `/sdlc:loop-phase NN` again to pick up the epics that are left.
 
+## Starting a part again
+
+Sometimes the problem is not a bug. The approach fought itself, and the fix is a
+rebuild. `/sdlc:respec <scope>` writes the spec for that rebuild.
+
+It reads the artifacts, the build notes, the review findings, the code, and the
+session, then writes a fresh spec that throws the old implementation away. Scope
+is one fix, one epic, one phase, or the whole app. The architecture inside the
+scope goes. The architecture outside it stands, and each new file names it.
+
+Every lesson in the new spec carries its evidence: a review finding, an issue
+ID, a build-note deviation, or a file. That evidence is the reason a respec
+beats a fresh run of the chain.
+
+The output is a parallel tree, `docs/sdlc-v2/`, in the same layout as
+`docs/sdlc/`. Nothing under `docs/sdlc/` changes, and the state file is
+untouched. The old tree stays as history. `/sdlc:respec` writes the spec and
+stops — it never starts the rebuild.
+
 ## How the chain asks
 
 One rule, so you always know whose turn it is:
@@ -161,6 +182,8 @@ block.
 - It never lands an epic that failed review.
 - It never runs `docker` or migration commands without a question first.
 - It never writes code before stage 6.
+- It never deletes a document. `/sdlc:respec` writes a new tree beside the old
+  one and leaves the old one intact.
 
 ## Make it yours
 

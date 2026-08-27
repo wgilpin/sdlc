@@ -102,6 +102,7 @@ has passed but still sits on its own branch.
 | `/sdlc:push-epic` | the epic is `reviewed` |
 | `/sdlc:loop-phase` | `phases` is `approved` |
 | `/sdlc:issue` | `state.md` exists |
+| `/sdlc:respec` | `state.md` exists |
 | `/sdlc:status` | nothing |
 
 `/sdlc:explore` and `/sdlc:design` are optional. The chain runs without them.

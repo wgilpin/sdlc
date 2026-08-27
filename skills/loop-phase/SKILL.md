@@ -99,10 +99,12 @@ For each epic, in build order:
 
 1. **Build.** Do [build-epic](../build-epic/SKILL.md) in full, with its task
    list confirmed by the gate above. Cut the branch, run the red-green-refactor
-   loop, write the build note, set the epic to `built`.
+   loop, write the build note, set the epic to `built`. Its close does not ask
+   for the review: the gate above already covers it, and step 2 runs it.
 2. **Review.** Do [review](../review/SKILL.md) in full — all three passes, and
-   run the tests yourself. Write the review block. Set the state from the
-   verdict.
+   run the tests yourself. Write the review block into the epic file. Set the
+   state from the verdict. Hold the detail for the digest at the end: mid-run,
+   print the verdict on the epic's line and nothing more.
 3. **Land.** On `pass` or `pass with follow-ups`, do
    [push-epic](../push-epic/SKILL.md) in full, with its gate answered by the
    gate above. Set the epic to `merged`. Keep the branch: the delete question
@@ -121,8 +123,10 @@ it if they want:
 epic-03-upload  built 7 tests · review pass · merged into main
 ```
 
-On a verdict of `pass with follow-ups`, add the follow-ups under the line as a
-numbered list. Do not act on them. They are the next phase's input.
+The line carries the verdict alone. The findings, the follow-ups, and any
+repair build go into the digest at the end of the run. A wall of review detail
+between epics buries the one thing the line is for: letting the user see the
+run move, and stop it.
 
 ### A failed review
 
@@ -162,9 +166,28 @@ Everything else is not a stop. A refactor you want, a test that needs a
 fixture, a name you dislike, a second approach that looks better — decide it
 yourself and record it in the build note.
 
+## The review digest
+
+Collect, for every epic the loop touched, four things as they happen. Write
+nothing to the user until the run ends.
+
+1. **The verdict**, and the date the review ran.
+2. **What the loop fixed itself.** A `fail` that a repair build cleared: the
+   acceptance criterion, and the test that proves it now.
+3. **The follow-ups**, from a `pass with follow-ups`. The loop does not act on
+   these.
+4. **The deviations** the build note records, and any finding a `pass` verdict
+   raised but did not block on.
+
+The epic files already carry every review block. The digest repeats them in one
+place so the user reads the phase in one sitting, and does not open five files.
+
+Never soften a verdict, and never drop a finding because the epic merged. A
+merged epic with an open finding is the exact thing the digest exists to show.
+
 ## The report
 
-At the end of the run, print the ledger and nothing else:
+At the end of the run, print the ledger, then the digest, and nothing else:
 
 ```
 Phase 02 — search. 4 of 5 epics merged into main.
@@ -175,11 +198,29 @@ Phase 02 — search. 4 of 5 epics merged into main.
   epic-04-cache    built 5 tests · review pass · merged
   epic-05-facets   blocked · AC-3 failed review twice
 
-Follow-ups
-  1. epic-03 — the ranking weights are hard-coded. Move them to config.
+Reviews
+  epic-01  pass
+  epic-02  pass
+  epic-03  pass with follow-ups
+             ISS-7 The ranking weights are hard-coded. Move them to config.
+  epic-04  pass · AC-2 failed once, fixed on the same branch by
+             test_cache_evicts_oldest
+  epic-05  fail twice on AC-3. Not merged. The spec and the code disagree
+             about what an empty facet returns.
 ```
 
-Six lines of prose or fewer above it. The ledger carries the detail.
+Six lines of prose or fewer above the ledger. The ledger and the digest carry
+the detail.
+
+## The follow-ups
+
+The run does not stop to ask about them. Write one entry per follow-up to
+`docs/sdlc/issues.md` as the digest is printed — the backlog route from
+[issue](../issue/SKILL.md), `Status: open`, `Lands in: unplanned`, each naming
+its epic. Give the ID in the digest line, so the user can find it later.
+
+Do not fix them, do not plan them, and do not open a question about them. They
+are the next run's input.
 
 ## Close
 
@@ -216,6 +257,7 @@ When the last phase merged, say the project is done.
 - [build-epic](../build-epic/SKILL.md) — step 3.1, and the TDD loop.
 - [review](../review/SKILL.md) — step 3.2, and the three passes.
 - [push-epic](../push-epic/SKILL.md) — step 3.3, and the merge sequence.
+- [issue](../issue/SKILL.md) — the backlog route, for the follow-ups.
 - [ASKING.md](../status/ASKING.md) — how the three preconditions and the gate
   ask.
 - [STATE-FORMAT.md](../status/STATE-FORMAT.md) — the state file and its rules.

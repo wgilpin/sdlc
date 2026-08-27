@@ -144,19 +144,37 @@ List the changed files so the user can commit them.
 
 ## Close
 
-End with the block from [NEXT-STEPS.md](../status/NEXT-STEPS.md). On green it
-reads:
+**On green, ask for the review.** A built epic is not a finished epic, and a
+`Next` line is easy to walk past. End the message with the question and nothing
+after it, as [ASKING.md](../status/ASKING.md) requires:
 
 ```
 Uncommitted: 6 files changed. Commit before you continue.
 
+**Review `epic-03` now?** Reply `yes` to run the three passes, or `no` to stop
+here.
+```
+
+On a `yes`, do [review](../review/SKILL.md) in full — all three passes — and
+close from there. On a `no`, print the block from
+[NEXT-STEPS.md](../status/NEXT-STEPS.md) in the next message:
+
+```
 Next
   → /sdlc:review 03        check it against the spec
     /sdlc:status           see the whole project
 ```
 
-On `blocked`, recommend nothing downstream. Say what failed, then offer the one
-action that unblocks it. `/sdlc:review` never runs on a blocked epic.
+The epic stays `built` either way. Only the review moves it on, and
+`/sdlc:push-epic` refuses a `built` epic. Never skip the question to save a
+turn.
+
+**Inside `/sdlc:loop-phase`, do not ask.** The loop gate already covers the
+review, and the loop runs it itself.
+
+On `blocked`, do not ask, and recommend nothing downstream. Say what failed,
+then offer the one action that unblocks it. `/sdlc:review` never runs on a
+blocked epic.
 
 On a conflict with `architecture.md`, make `/sdlc:architect` the
 recommendation and name the contradiction.

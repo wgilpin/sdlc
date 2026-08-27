@@ -24,6 +24,22 @@ docs/sdlc/
 docs/adr/NNNN-<slug>.md     stage 3 and stage 6
 ```
 
+`/sdlc:respec` writes a parallel tree, and never touches the one above:
+
+```
+docs/sdlc-v2/
+  README.md                 what this tree is, and what it replaces
+  concept.md                scope all
+  architecture.md           scope all
+  phases.md                 scope all
+  phase-01-<slug>/
+    phase.md                scope phase
+    test-plan.md            scope phase
+    epic-01-<slug>.md       scope epic and scope phase, spec block only
+  fixes/
+    respec-<slug>.md        scope fix
+```
+
 ## Naming
 
 - Numbers are two digits, from `01`, in build order.
@@ -365,6 +381,71 @@ second. Stage 7 appends the third. Nothing rewrites an earlier block.
 
 ### Follow-ups
 ```
+
+## respec
+
+Written by `/sdlc:respec` into `docs/sdlc-v2/`. Absent until a rebuild is
+specified.
+
+Every file in that tree carries this header, then the template above for its
+own kind — `concept.md`, `architecture.md`, `phases.md`, `phase.md`,
+`test-plan.md`, or the epic spec block. There is no second format.
+
+```markdown
+**Respecs:** <the docs/sdlc/ path this file replaces>
+**Written from:** <short commit sha> on <YYYY-MM-DD>
+**Throw away:** <the files and modules the rebuild deletes>
+**Inherited, not rebuilt:** <the architecture and the phases outside this scope>
+
+## Lessons from the first build
+
+<One line per lesson, each with its evidence: a review finding, an issue ID, a
+build-note deviation, or a file. No lesson without evidence.>
+```
+
+An epic file in `docs/sdlc-v2/` holds the spec block alone. No build note and
+no review block, because that build has not happened.
+
+`docs/sdlc-v2/README.md`:
+
+```markdown
+# Rebuild spec — <project name>
+
+**Scope:** <fix / epic NN / phase NN / all>
+**Written from:** <short commit sha> on <YYYY-MM-DD>
+**Replaces:** <the docs/sdlc/ paths this tree supersedes>
+
+<Two to four sentences. Why the rebuild, and what the first build taught.>
+
+The files under `docs/sdlc/` are history. Nothing in this tree changes them.
+```
+
+`fixes/respec-<slug>.md`, the one template the main list does not cover:
+
+```markdown
+# Respec — <the behaviour in one sentence>
+
+<the shared header block>
+
+## Behaviour
+
+<Given / When / Then, numbered AC-1. One behaviour, or two at most.>
+
+## What the first build got wrong
+
+<Two lines at most, with the file and the evidence.>
+
+## Proved by
+
+<The test that proves the rebuild. Name it.>
+
+## Delete
+
+<The files and the functions the rebuild removes.>
+```
+
+Numbers and slugs carry over from `docs/sdlc/`. A respec of epic 02 stays epic
+02. The tree is a replacement, not a renumber.
 
 ## ADR
 
