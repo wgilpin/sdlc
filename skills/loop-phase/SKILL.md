@@ -20,6 +20,10 @@ must be forced by a rule in [When a rule forces a stop](#when-a-rule-forces-a-st
 Nothing here weakens a rule. The gates of stages 5 to 8 are not skipped — they
 are answered in advance, by one question that names what the run does.
 
+Each epic builds in a fresh subagent. The main context plans, reviews, lands,
+and keeps one line per epic. A long phase does not lose detail to compaction,
+and the context that reviews an epic is not the one that wrote it.
+
 ## Preconditions
 
 Read `docs/sdlc/state.md`. The `phases` stage must be `approved`. If it is not,
@@ -97,14 +101,13 @@ carry into a later run, and it does not cover a file the epics do not touch.
 
 For each epic, in build order:
 
-1. **Build.** Do [build-epic](../build-epic/SKILL.md) in full, with its task
-   list confirmed by the gate above. Cut the branch, run the red-green-refactor
-   loop, write the build note, set the epic to `built`. Its close does not ask
-   for the review: the gate above already covers it, and step 2 runs it.
-2. **Review.** Do [review](../review/SKILL.md) in full — all three passes, and
-   run the tests yourself. Write the review block into the epic file. Set the
-   state from the verdict. Hold the detail for the digest at the end: mid-run,
-   print the verdict on the epic's line and nothing more.
+1. **Build, in a subagent.** Cut the branch from the default branch yourself.
+   Then launch one `general-purpose` agent in the foreground — the loop needs
+   its result before the review. See [The build agent](#the-build-agent).
+2. **Review.** Do [review](../review/SKILL.md) in full, from the main context.
+   Its passes 1 and 2 run in their own agents. Write the review block into the
+   epic file. Set the state from the verdict. Hold the detail for the digest
+   at the end: mid-run, print the verdict on the epic's line and nothing more.
 3. **Land.** On `pass` or `pass with follow-ups`, do
    [push-epic](../push-epic/SKILL.md) in full, with its gate answered by the
    gate above. Set the epic to `merged`. Keep the branch: the delete question
@@ -113,6 +116,51 @@ For each epic, in build order:
 
 Between epics you are on the default branch, and it is pulled. The next branch
 starts from the code the last epic landed.
+
+### The build agent
+
+The agent does [build-epic](../build-epic/SKILL.md) in full, except that it asks
+nothing. The prompt names:
+
+- The epic ID, the epic file path, and the phase folder.
+- The branch it is on, and the default branch.
+- `build-epic/SKILL.md` and `build-epic/TDD-LOOP.md`, by absolute path from
+  this skill's base directory.
+- These rules. The task list is approved: do not show it and do not wait.
+  Never commit, push, or run any git write. Never run `docker`, a migration,
+  or a database reset. Write the build note and set the epic to `built` in
+  `state.md` only when the suite is green.
+- **Parallel Tool Batching (mandatory for fast execution, especially on `flash`):**
+  1. **Turn 1 (Batch Read):** Call `view_file` on **all** files listed in the epic's `## Files` section (plus shared schema/type files and `state.md`) in a **single parallel turn**. Never read files one per turn or guess paths with `find`.
+  2. **Turn 2 (Write Tests — RED):** Create or update the test file(s) and run the test command from `architecture.md` once.
+  3. **Turn 3 (Batch Implementation — GREEN):** Emit `write_to_file` / `replace_file_content` across **all** distinct implementation files in a **single parallel turn** (only multiple non-adjacent edits to the *same* file require separate turns).
+  4. **Turn 4 (Verify GREEN):** Run the test command from `architecture.md` once. Do not run extra unrequested commands (`npm run build`, `git status`, `rm`, etc.) unless the test command fails.
+  5. **Turn 5 (Batch Bookkeeping):** Append the `## Build note` to the epic file and set the epic to `built` in `docs/sdlc/state.md` in a **single parallel turn**, then return immediately.
+- The return format below.
+
+A subagent cannot ask the user a question. At any stop, it returns instead:
+
+```
+status: green | stuck | conflict | needs-command
+tests added: <count>
+files changed: <paths>
+detail: <the failing test, the contradiction, or the exact command and its hazard>
+```
+
+Act on the status:
+
+| Status | What the main context does |
+|---|---|
+| `green` | Step 2, the review. |
+| `needs-command` | Ask the user, as the stop table requires. On a yes, run the command, then continue the same agent with `SendMessage`. On a no, stop the run. |
+| `stuck` | Stop. See the stop table. |
+| `conflict` | Stop. See the stop table. |
+
+Check the agent's claim. A `green` with no build note in the epic file, or an
+epic not set to `built`, is not green. Treat it as `stuck`.
+
+If the Agent tool is not available, build in the main context, as
+[build-epic](../build-epic/SKILL.md) describes.
 
 ### The line per epic
 
@@ -134,7 +182,8 @@ A `fail` is the one place the loop repairs itself. `/sdlc:review` recommends
 `/sdlc:build-epic` on the same epic, so take that recommendation once:
 
 1. Say which acceptance criterion failed.
-2. Build again, on the same branch, against that criterion only.
+2. Build again, on the same branch, against that criterion only. Use a fresh
+   build agent. Add the failed criterion and the review block to its prompt.
 3. Review again.
 
 A second `fail` on the same epic stops the run. Two failures mean the spec and
@@ -163,8 +212,8 @@ epic, say the reason, and name the one command that continues:
 `/sdlc:loop-phase NN` picks up the epics that are left.
 
 Everything else is not a stop. A refactor you want, a test that needs a
-fixture, a name you dislike, a second approach that looks better — decide it
-yourself and record it in the build note.
+fixture, a name you dislike, a second approach that looks better — the build
+agent decides it and records it in the build note. Put this rule in its prompt.
 
 ## The review digest
 
@@ -254,7 +303,8 @@ When the last phase merged, say the project is done.
 ## Reference
 
 - [plan-phase](../plan-phase/SKILL.md) — step 1 in full.
-- [build-epic](../build-epic/SKILL.md) — step 3.1, and the TDD loop.
+- [build-epic](../build-epic/SKILL.md) — what the build agent does, and the
+  TDD loop.
 - [review](../review/SKILL.md) — step 3.2, and the three passes.
 - [push-epic](../push-epic/SKILL.md) — step 3.3, and the merge sequence.
 - [issue](../issue/SKILL.md) — the backlog route, for the follow-ups.

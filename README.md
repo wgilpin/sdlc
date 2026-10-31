@@ -114,7 +114,9 @@ without a stop.
 ## Running a whole phase
 
 `/sdlc:loop-phase 02` does stages 5 to 8 for one phase in a single run. It
-plans the phase, then builds, reviews, and lands every epic in order.
+plans the phase, then builds, reviews, and lands every epic in order. Each epic
+builds in a fresh subagent, so a long phase keeps its detail and the reviewer is
+not the builder.
 
 It asks three things before it starts — a repository, a clean working tree, a
 green suite — and then one gate that shows the epics and warns that the run

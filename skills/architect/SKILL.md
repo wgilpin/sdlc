@@ -63,6 +63,10 @@ Cover these. Skip any the concept already fixed.
 5. **Scale.** How much data and how many users, honestly. Design for that
    number, not for a hundred times it.
 6. **Failure.** What breaks, and what happens when it does.
+7. **Exposure.** Who can reach this (local only, behind login, or the public
+   internet), where auth and secrets live, and what stops a stranger from
+   reading someone else's data or running up a bill. For a local-only tool,
+   write one line ("Local only — no network or auth surface") and move on.
 
 ## Spikes
 

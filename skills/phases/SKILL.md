@@ -83,7 +83,7 @@ Rules:
 - Every phase has a goal, a "works after this" line, a "not in this phase"
   list, and its dependencies.
 - Status does not go in this file. Status lives in `state.md`.
-- Under 600 words in total.
+- Aim for under 100 words per phase.
 
 Then update `docs/sdlc/state.md`:
 

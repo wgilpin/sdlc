@@ -35,6 +35,19 @@ apply it to the templates. For an HTMX and Jinja2 project, use the
 Resolve the epic from `$ARGUMENTS`. If `$ARGUMENTS` is empty, take the first
 epic in the current phase that is not `reviewed`.
 
+If another epic in the current phase is `built` (unreviewed), stop before you
+touch a branch or write code. End the message with these two blocks and nothing
+after them:
+
+> WARNING: `epic-NN` is built but has not been reviewed or merged. Skipping
+> review leaves its acceptance criteria, drift, and security checks unverified.
+>
+> **Review `epic-NN` first?** Reply `yes` to run the three passes on `epic-NN`,
+> or `skip` to build the new epic anyway.
+
+On a `yes`, do [review](../review/SKILL.md) in full on that earlier epic and
+close from there. On `skip`, continue with the requested epic.
+
 ## Check for a repository first
 
 Run `git rev-parse --is-inside-work-tree`.
@@ -94,6 +107,15 @@ Follow [TDD-LOOP.md](TDD-LOOP.md). In short, per slice:
 
 Slice 1 is the tracer bullet: the thinnest line through every layer this epic
 touches.
+
+### Parallel tool batching
+
+Always batch independent tool calls into a single turn rather than emitting one tool call per turn:
+
+1. **Batch reads:** Read the epic file, `state.md`, and all existing files listed in the epic's `## Files` section in a **single parallel turn**. Do not read files one by one across separate turns.
+2. **Batch writes across distinct files:** When creating or editing multiple distinct files for a slice, emit all `write_to_file` / `replace_file_content` calls for different files in a **single parallel turn**.
+3. **No unrequested shell commands:** Run only the test command from `architecture.md`. Do not run extra `build`, `find`, `git status`, or cleanup commands unless diagnosing a test failure.
+4. **Batch bookkeeping:** When the suite is green, append the build note to the epic file and update `docs/sdlc/state.md` in a **single parallel turn**.
 
 ## When to stop early
 
@@ -156,10 +178,14 @@ here.
 ```
 
 On a `yes`, do [review](../review/SKILL.md) in full — all three passes — and
-close from there. On a `no`, print the block from
-[NEXT-STEPS.md](../status/NEXT-STEPS.md) in the next message:
+close from there. On a `no`, warn the user that the review was skipped and
+print the block from [NEXT-STEPS.md](../status/NEXT-STEPS.md) in the next
+message:
 
 ```
+WARNING: `epic-03` has not been reviewed. Spec conformance, drift, and
+security checks have not run, and `/sdlc:push-epic` will refuse to land it.
+
 Next
   → /sdlc:review 03        check it against the spec
     /sdlc:status           see the whole project
@@ -169,8 +195,10 @@ The epic stays `built` either way. Only the review moves it on, and
 `/sdlc:push-epic` refuses a `built` epic. Never skip the question to save a
 turn.
 
-**Inside `/sdlc:loop-phase`, do not ask.** The loop gate already covers the
-review, and the loop runs it itself.
+**Inside `/sdlc:loop-phase`, do not ask.** A subagent runs this skill there.
+The loop gate already covers the task list and the review. At any stop, the
+subagent returns a status to the loop instead of asking. The loop's
+`## The build agent` section gives the format.
 
 On `blocked`, do not ask, and recommend nothing downstream. Say what failed,
 then offer the one action that unblocks it. `/sdlc:review` never runs on a

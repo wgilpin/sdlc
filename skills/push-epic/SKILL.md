@@ -18,10 +18,17 @@ Read `docs/sdlc/state.md`. Find the epic.
 Stop, and say why, when any of these hold:
 
 - The epic is `built`, not `reviewed`. Unreviewed code does not land. Do not
-  just refuse: end the message with **Review `epic-NN` now?** Reply `yes` to
-  run the three passes, or `no` to stop here. On a `yes`, do
-  [review](../review/SKILL.md) in full, then start this skill again from the
-  top. On a `no`, stop.
+  just refuse — warn the user and offer the review, ending the message with
+  these two blocks and nothing after them:
+
+  > WARNING: `epic-NN` is built but has not been reviewed. Unreviewed code has
+  > not passed conformance, drift, or security checks and cannot land.
+  >
+  > **Review `epic-NN` now?** Reply `yes` to run the three passes, or `no` to
+  > stop here.
+
+  On a `yes`, do [review](../review/SKILL.md) in full, then start this skill
+  again from the top. On a `no`, stop.
 - The epic is `blocked`. Fix the review findings first.
 - The epic is already `merged`. Say so and stop.
 - The directory is not a git repository.
@@ -46,10 +53,14 @@ whatever the state file says.
    file that the epic's build note does not name, then end the message with:
    **Include these in the commit?** Reply with the files to include, or `none`.
    Do not stash and do not commit them without an answer.
-2. **The tests.** Run the full suite from the `## Stack` block in
+2. **Secrets and credentials.** Check the files to be committed and the diff
+   against the default branch for `.env*` files, private keys, local database
+   files (`.db`, `.sqlite*`), or hard-coded API keys, tokens, and passwords.
+   If any are present, list the file and line, refuse to stage them, and stop.
+3. **The tests.** Run the full suite from the `## Stack` block in
    `architecture.md`. A red suite blocks the merge. Report the failure and
    stop. Do not merge on the strength of a review that ran earlier.
-3. **The default branch moved.** Fetch, then check whether the default branch
+4. **The default branch moved.** Fetch, then check whether the default branch
    has commits the epic branch lacks. Say so, because the merge can conflict.
 
 ## The commit message
