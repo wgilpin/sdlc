@@ -41,11 +41,15 @@ epics nested under it:
 - [ ] 01-<slug> — in progress
   - [x] epic-01-<slug> — reviewed 2026-08-14
   - [ ] epic-02-<slug> — building
+
 - [ ] 02-<slug> — pending
 
 A phase with no epics under it is not planned yet. Run /sdlc:plan-phase
 to fill it in.
 >
+
+Keep one blank line between phases so a build on phase N and a plan on
+phase N+1 merge cleanly in git.
 
 ## Notes for a fresh session
 

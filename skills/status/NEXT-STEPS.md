@@ -95,15 +95,18 @@ Three cases end the chain instead of advancing it:
 
 ## Commit reminder
 
-Only `/sdlc:push-epic` commits. Every other skill leaves the changes in the
-working tree.
+`/sdlc:plan-phase` commits and merges an approved phase plan locally onto the
+default branch, and `/sdlc:push-epic` commits, pushes, and merges a reviewed
+epic branch. Stages 1 to 4 and stages 6 to 7 leave changes in the working
+tree.
 
-When a skill changed files in the repo, put one line above the `Next` block:
+When a skill left uncommitted files in the repo, put one line above the `Next`
+block:
 
 ```
 Uncommitted: 4 files changed. Commit before you continue.
 ```
 
 For a code change on an epic branch, recommend `/sdlc:push-epic` instead of a
-manual commit, once the epic is `reviewed`. The document stages change
-documents, which the user commits.
+manual commit, once the epic is `reviewed`. Stages 1 to 4 change documents,
+which the user commits.

@@ -21,8 +21,8 @@ evidence.
 
 ## Orient on the code first
 
-For an existing repo, read before you propose. Use the Explore subagent when
-the repo is large.
+For an existing repo, read before you propose. Use the `research` subagent
+(`invoke_subagent` with `TypeName: "research"`) when the repo is large.
 
 - The package manifest and the lock file. They name the stack that exists.
 - The top-level source directories. They show the current shape.
@@ -45,8 +45,8 @@ like one.
 - Recommend one, and name the factor that decided it.
 - Say when a decision is cheap to reverse. Those decisions do not need a
   session.
-- Respect the user's rules in `CLAUDE.md`. They are constraints, not
-  suggestions.
+- Respect the user's rules in `AGENTS.md` and `CLAUDE.md`. They are
+  constraints, not suggestions.
 
 Prefer the boring choice. A dependency the user already runs beats a better
 one they do not.

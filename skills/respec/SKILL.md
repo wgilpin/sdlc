@@ -64,8 +64,9 @@ Build-note deviations and review findings are the richest evidence in the repo.
 Read them before you read the code. A deviation is the plan and the reality in
 one place, with the reason already written.
 
-**The built code.** Read what the scope owns. Use the Explore subagent when the
-surface is wide. The code holds what no document recorded: the real data shape,
+**The built code.** Read what the scope owns. Use the `research` subagent
+(`invoke_subagent` with `TypeName: "research"`) when the surface is wide. The
+code holds what no document recorded: the real data shape,
 the endpoints, the edge cases somebody handled at 2am.
 
 **This conversation.** Decisions and complaints from this session that never

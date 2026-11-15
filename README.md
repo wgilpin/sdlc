@@ -48,6 +48,10 @@ decline.
 `/sdlc:build-epic` refuses to write code in a directory with no git
 repository. It offers `git init` and waits for an answer.
 
+`/sdlc:plan-phase` drafts on `plan/phase-NN-<slug>` (inside `.worktrees/` once
+`phases.md` is committed, so you can plan the next phase while an epic builds)
+and merges the approved plan locally into the default branch.
+
 Each epic gets its own branch, `epic-NN-<slug>`, cut from an up-to-date default
 branch. `/sdlc:push-epic` lands it and returns you to the default branch.
 
@@ -178,8 +182,9 @@ block.
 
 ## What the chain never does
 
-- Only `/sdlc:push-epic` runs a git write command, and it asks once first.
-  Every other skill leaves the changes in the working tree.
+- Only `/sdlc:plan-phase`, `/sdlc:push-epic`, and `/sdlc:loop-phase` run git
+  write commands, and each asks at its gate first. Stages 1 to 4 and 6 to 7
+  leave changes in the working tree.
 - It never force pushes and never rewrites history.
 - It never lands an epic that failed review.
 - It never runs `docker` or migration commands without a question first.

@@ -32,17 +32,28 @@ that uses it.
 
 Per slice:
 
-1. **Red.** Write one failing test. Run it. Read the failure message. Make sure
-   that it fails for the reason you expect. A test that fails on an import
-   error proves nothing.
+1. **Red.** In statically typed or cross-layer codebases, verify exact existing
+   enum/record/module signatures first — or compile minimal unimplemented
+   public type/interface stubs as part of Slice 1 RED — before generating
+   multi-test integration suites against new types/DTOs, so you do not guess
+   names and burn compile-fix retries. Write one failing test. Run it. Read the
+   failure message. Make sure it fails for the reason you expect. A test that
+   fails on an import error or guessed symbol proves nothing.
 2. **Green.** Write the smallest code that passes. Hard-coded values are fine
    in slice 1. The next test removes them.
-3. **Suite.** Run the whole suite, not one test. A green slice that reddens
-   another test is not green.
-4. **Refactor.** Improve the names and the shape while the suite stays green.
-   Run the suite after each change. Stop when the code reads well.
+3. **Verify.** Use filtered incremental test runs (`--filter` / `--no-restore`
+   after edits; pass `--no-build` only when binaries were already built for the
+   current edits) for inner-loop slices, and run the whole suite plus any
+   batched headless/runtime verification scripts once at final GREEN. A slice
+   is not green if it reddens another test.
+4. **Refactor.** Improve the names and the shape while tests stay green. Re-run
+   relevant tests after each change, and verify the full suite is green before
+   finishing. Stop when the code reads well.
 
-Never write the code before the test. Never write two failing tests at once.
+Never write behaviour before the test (minimal unimplemented public
+type/interface stubs in Slice 1 RED are fine so tests compile). Keep RED
+focused on one slice at a time rather than dumping speculative tests across
+unbuilt layers.
 
 ## Where to put the test
 
@@ -59,8 +70,8 @@ they open /admin, then they see a 403` is a route test.
 Name the test after the behaviour, not the function. `test_malformed_row_is_
 reported`, not `test_parse_row_2`.
 
-Use the project's vocabulary. If `CONTEXT.md` calls it a `source`, the test
-says `source`.
+Use the project's domain vocabulary. If the `CONTEXT.md` glossary calls it a
+`source`, the test says `source`.
 
 ## Mocking
 
@@ -73,10 +84,10 @@ Mock at the edge of your system, never inside it.
 A test that mocks your own code tests the mock. When mocking your own code
 feels necessary, the seam is in the wrong place. Move the seam.
 
-**The database is not a third-party service.** Use a real test database. The
-user's rules require a dedicated one, separate from the live database. Read
-`TEST_DATABASE_URL` from the project configuration. Never point a test at the
-live database.
+**When the project uses a database, it is not a third-party service.** Use a
+dedicated real test database (for example `TEST_DATABASE_URL` from the project
+configuration), separate from any live database. Never point a test at a live
+database.
 
 ## Definition of green
 
@@ -92,7 +103,8 @@ failed, what you tried, and what you think is wrong. Do not delete the test.
 
 ## Refactor rules
 
-Refactor only on green. Refactor in small steps. Run the suite after each one.
+Refactor only on green. Refactor in small steps. Re-run relevant tests after
+each one, and confirm the full suite stays green.
 
 Worth doing:
 

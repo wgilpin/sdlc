@@ -22,7 +22,8 @@ Read, in full:
 - `docs/sdlc/phase-NN-<slug>/test-plan.md` and `phase.md`
 - `docs/sdlc/architecture.md`
 - `docs/sdlc/concept.md`
-- `CLAUDE.md`, `CONTEXT.md`, and `docs/adr/`, if they exist
+- `AGENTS.md` and `CLAUDE.md` (repo/tooling rules), `CONTEXT.md` (domain
+  glossary), and `docs/adr/`, if they exist
 
 Get the diff. Prefer `git diff <default-branch>...HEAD` plus the unstaged
 changes. If the repo is not a git repository, review the files named in the
@@ -33,27 +34,31 @@ build note.
 An agent that gets only the spec and the diff has no memory of what the builder
 meant. It judges the code that exists. So passes 1 and 2 run in subagents.
 
-1. **Launch two agents in one message**, both `general-purpose`, both in the
-   background. One runs pass 1, one runs pass 2.
-2. **Run pass 3 in the main context** while they work.
+1. **Launch two subagents in one parallel turn** via `invoke_subagent`
+   (`TypeName: "self"`): one runs Pass 1, one runs Pass 2.
+2. **Run pass 3 in the main context** while they work, then end your turn and
+   wait for both subagents to report.
 3. **Merge** when both agents report. See [Merging the passes](#merging-the-passes).
 
 Each agent prompt names:
 
-- The epic file path, the phase folder, and the paths to `architecture.md` and
-  `concept.md`.
+- The epic file path, the phase folder, and the paths to `architecture.md`,
+  `concept.md`, and any existing `AGENTS.md`, `CLAUDE.md`, and `CONTEXT.md`.
 - The diff command, with the default branch filled in.
+- For Pass 1 inside `/sdlc:loop-phase`: the build agent's reported `suite`
+  command and summary output, plus whether any code, build/config, or test file
+  changed since that run.
 - This file, by absolute path from the skill's base directory, and the one
   section the agent follows: `## Pass 1 — Conformance` or `## Pass 2 — Drift`.
 - The return format for that pass, copied from the section.
 - These rules: read only. Edit no file. Run no git write command. Ask the user
   nothing.
 
-Only the pass 1 agent runs the test suite. The project has one test database,
-and two suites at once break each other. Pass 3 and the pass 2 agent run no
-tests.
+Only the pass 1 agent runs the test suite (when a suite run is needed — see
+Pass 1), so concurrent agents never contend on shared test state, ports, or
+databases. Pass 3 and the pass 2 agent run no tests.
 
-If the Agent tool is not available, run the three passes in sequence in the
+If `invoke_subagent` is not available, run the three passes in sequence in the
 main context. The content of each pass does not change.
 
 ## Pass 1 — Conformance
@@ -63,8 +68,15 @@ For each acceptance criterion in the epic, answer two questions:
 1. Does the code do this?
 2. Which test proves it?
 
-**Then run the tests.** Do not trust the build note. The pass 1 agent runs the
-command from the `## Stack` block in `architecture.md` and reads the output.
+**Verify the test run.** In a standalone review, do not trust the build note —
+run the command from the `## Stack` block in `architecture.md` and read the
+output. Inside `/sdlc:loop-phase`, skip re-running the full rebuild+test cycle
+when all three hold: (1) the build agent ran the full suite command from
+`architecture.md` (not a `--filter` subset) with 0 failures and 0 skipped
+tests, (2) every acceptance criterion's test exists in the diff and asserts
+real behaviour, and (3) no code, build/config, or test files changed since that
+run (only `docs/sdlc/` bookkeeping). Re-run the full suite if any of the three
+fails or the reported output is missing or ambiguous.
 
 A criterion counts as met only when a test that passes covers it. Mark it `no`
 when:
@@ -103,8 +115,8 @@ the code location, and `doc out of date` or `code wrong`. Or the one word
 
 ## Pass 3 — Correctness and security
 
-Hunt bugs and security exposures, in the main context. Delegate the deep pass
-to the built-in `/code-review` command and fold its findings into yours.
+Hunt bugs and security exposures, in the main context. Inspect the full diff
+directly (and fold in `/code-review` findings when that command is available).
 
 Check every diff against these five security rules:
 
@@ -121,12 +133,9 @@ Check every diff against these five security rules:
 - **No unbounded public exposure.** Any public route or webhook that calls a
   paid API or accepts uploads has a signature check, size limit, or rate limit.
 
-Add the checks that `/code-review` does not know about. Read `CLAUDE.md` and
-apply the user's own rules. In this project those include:
-
-- No test points at the live database. Tests use a dedicated test database.
-- No inline JavaScript in a template. JavaScript lives in a static file.
-- No live database without scheduled backups.
+Add the checks that `/code-review` does not know about. Read `AGENTS.md`,
+`CLAUDE.md` (if present), and `docs/sdlc/architecture.md`, and enforce the
+project's own rules and invariants declared there.
 
 Rank every finding. Say what breaks — or what an attacker can do — in plain
 English, and for whom.

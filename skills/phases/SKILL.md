@@ -87,7 +87,8 @@ Rules:
 
 Then update `docs/sdlc/state.md`:
 
-- Add every phase to `## Phases`, in order, each with status `pending`.
+- Add every phase to `## Phases`, in order, separated by a blank line, each with
+  status `pending`.
 - Set `phases` to `in progress`.
 
 ## The gate

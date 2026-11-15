@@ -29,6 +29,10 @@ and the context that reviews an epic is not the one that wrote it.
 Read `docs/sdlc/state.md`. The `phases` stage must be `approved`. If it is not,
 name the missing stage and stop.
 
+Read `docs/sdlc/architecture.md`, plus `AGENTS.md` and `CLAUDE.md` (if present,
+for stable repo/tooling rules and test flags) and `CONTEXT.md` (if present,
+strictly for domain glossary terms).
+
 Resolve the phase from `$ARGUMENTS`, the way
 [plan-phase](../plan-phase/SKILL.md) does. If `$ARGUMENTS` is empty, take the
 first phase that is not `done`.
@@ -55,13 +59,15 @@ up front, not one epic at a time.
 
 ## Step 1 — Plan the phase
 
-Do the whole of [plan-phase](../plan-phase/SKILL.md): the done criteria, the
-epics, the acceptance criteria, the test plan, and the files under
-`docs/sdlc/phase-NN-<slug>/`. Update `state.md`.
+Do the whole of [plan-phase](../plan-phase/SKILL.md): the plan branch or
+worktree setup, the done criteria, the epics, the acceptance criteria, the test
+plan, and the files under `docs/sdlc/phase-NN-<slug>/`. Update `state.md`.
 
 Two changes:
 
-- **Its gate does not run.** The loop gate below replaces it.
+- **Its gate and landing wait.** Do not run `plan-phase`'s gate or
+  `## Land the plan` yet. Step 2's loop gate covers approval, and Step 3 lands
+  the plan onto `<default>` once the user replies `yes`.
 - **A gap does not ask.** `plan-phase` normally asks how to prove an uncovered
   done criterion. Here, list every gap above the loop gate instead. The user
   sees the holes and decides with one answer. Do not invent a test to close a
@@ -69,7 +75,9 @@ Two changes:
 
 **When the phase is already planned, skip this step.** A folder with epic files
 and epics in `state.md` means a run stopped earlier. Say so, say which epics
-are left, and go to the gate with the remaining epics only.
+are left, and go to the gate with the remaining epics only. If an unmerged
+`plan/phase-NN-<slug>` branch or worktree exists from an earlier interrupted
+run, reuse it and land it in Step 3 after the gate.
 
 ## Step 2 — The one gate
 
@@ -84,8 +92,8 @@ Show, in this order, and keep each line short:
 Then end the message with these two blocks, in this order, and nothing after
 them:
 
-> WARNING: This commits, pushes, and merges `N` branches into `<default>`. One
-> command does not undo it.
+> WARNING: This commits, pushes, and merges into `<default>` (the phase plan, if
+> new, and `N` epic branches). One command does not undo it.
 >
 > **Run the loop for phase NN?** Reply `yes` to build, review, and land all N
 > epics, or `no` to stop.
@@ -94,24 +102,44 @@ The question is the last line. No `Next` block, no summary. Wait for a clear
 yes. A question in reply is not a yes.
 
 This yes is the explicit permission the user's git rules require. It covers
-every commit, push, and merge the run makes, and nothing else. It does not
-carry into a later run, and it does not cover a file the epics do not touch.
+every commit, push, and merge the run makes — including promoting confirmed,
+repo-wide `Tooling / Invariant candidates` from epic build notes into
+`AGENTS.md` / `CLAUDE.md` (keeping root rule files under ~50 lines, never
+writing tooling rules into `CONTEXT.md`) — and nothing else. It does not carry
+into a later run, and it does not cover unrelated files.
+
+On `no`, if Step 1 drafted on `plan/phase-NN-<slug>`, leave that branch
+unmerged. When Step 1 used a worktree, `<default>` in the main tree stays clean
+and the draft remains in `.worktrees/plan-phase-NN-<slug>`.
 
 ## Step 3 — The loop
+
+0. **Land the plan first, if drafted in Step 1.** When Step 1 created or reused
+   `plan/phase-NN-<slug>`, run `## Land the plan` from
+   [plan-phase](../plan-phase/SKILL.md) before cutting `epic-01` so
+   `docs/sdlc/phase-NN-<slug>/` and `state.md` are committed on `<default>`.
 
 For each epic, in build order:
 
 1. **Build, in a subagent.** Cut the branch from the default branch yourself.
-   Then launch one `general-purpose` agent in the foreground — the loop needs
-   its result before the review. See [The build agent](#the-build-agent).
+   Then launch one build subagent via `invoke_subagent` (`TypeName: "self"`) and
+   stop calling tools until it reports — the loop needs its result before the
+   review. See [The build agent](#the-build-agent).
 2. **Review.** Do [review](../review/SKILL.md) in full, from the main context.
-   Its passes 1 and 2 run in their own agents. Write the review block into the
-   epic file. Set the state from the verdict. Hold the detail for the digest
-   at the end: mid-run, print the verdict on the epic's line and nothing more.
+   Its passes 1 and 2 run in their own agents. Pass the build agent's reported
+   `suite` command and summary output to Pass 1 so it skips a redundant full
+   rebuild+test cycle when no code, build/config, or test files changed since
+   that run. Write the review block into the epic file. Set the state from the
+   verdict. Hold the detail for the digest at the end: mid-run, print the
+   verdict on the epic's line and nothing more.
 3. **Land.** On `pass` or `pass with follow-ups`, do
    [push-epic](../push-epic/SKILL.md) in full, with its gate answered by the
-   gate above. Set the epic to `merged`. Keep the branch: the delete question
-   does not run in a loop, and an unmerged branch costs nothing.
+   gate above. Reuse the verified full-suite result when no code, build/config,
+   or test files changed during review and the runner requires no separate
+   pre-merge check, and promote any confirmed `Tooling / Invariant candidates`
+   into `AGENTS.md` / `CLAUDE.md` in the same commit. Set the epic to `merged`.
+   Keep the branch: the delete question does not run in a loop, and an unmerged
+   branch costs nothing.
 4. **Report one line**, then start the next epic.
 
 Between epics you are on the default branch, and it is pulled. The next branch
@@ -120,10 +148,14 @@ starts from the code the last epic landed.
 ### The build agent
 
 The agent does [build-epic](../build-epic/SKILL.md) in full, except that it asks
-nothing. The prompt names:
+nothing and skips the pre-Slice-1 `## Pre-existing failures` suite check
+(Precondition 3 and each prior merged epic already proved `<default>` is green).
+The prompt names:
 
 - The epic ID, the epic file path, and the phase folder.
 - The branch it is on, and the default branch.
+- `AGENTS.md` and `CLAUDE.md` (if present) for repo/tooling rules, and
+  `CONTEXT.md` (if present, strictly for domain glossary terms).
 - `build-epic/SKILL.md` and `build-epic/TDD-LOOP.md`, by absolute path from
   this skill's base directory.
 - These rules. The task list is approved: do not show it and do not wait.
@@ -131,11 +163,37 @@ nothing. The prompt names:
   or a database reset. Write the build note and set the epic to `built` in
   `state.md` only when the suite is green.
 - **Parallel Tool Batching (mandatory for fast execution, especially on `flash`):**
-  1. **Turn 1 (Batch Read):** Call `view_file` on **all** files listed in the epic's `## Files` section (plus shared schema/type files and `state.md`) in a **single parallel turn**. Never read files one per turn or guess paths with `find`.
-  2. **Turn 2 (Write Tests — RED):** Create or update the test file(s) and run the test command from `architecture.md` once.
-  3. **Turn 3 (Batch Implementation — GREEN):** Emit `write_to_file` / `replace_file_content` across **all** distinct implementation files in a **single parallel turn** (only multiple non-adjacent edits to the *same* file require separate turns).
-  4. **Turn 4 (Verify GREEN):** Run the test command from `architecture.md` once. Do not run extra unrequested commands (`npm run build`, `git status`, `rm`, etc.) unless the test command fails.
-  5. **Turn 5 (Batch Bookkeeping):** Append the `## Build note` to the epic file and set the epic to `built` in `docs/sdlc/state.md` in a **single parallel turn**, then return immediately.
+  1. **Orient and batch reads:** Call `read_file` on `state.md`, the epic file,
+     `AGENTS.md` / `CLAUDE.md`, `CONTEXT.md`, and known small files (`<= 300`
+     lines) from `## Files` (plus shared schema/type files) in a **single
+     parallel turn**. For files over ~300 lines (check with `wc -l` + `rg -n`
+     in one command when unsure), locate target symbols/sections with `rg -n`
+     first, then batch parallel `read_file` calls with explicit line ranges
+     (`<= 400` lines per chunk) instead of triggering truncation or reading in
+     sequential small chunks across turns. Never guess paths with `find`.
+  2. **Verify signatures and RED:** Before generating multi-test integration
+     suites against new types/DTOs, verify exact existing enum/record/module
+     signatures from those reads — or compile minimal unimplemented public
+     type/interface stubs as part of Slice 1 RED (a fast incremental
+     build/typecheck is allowed here) — so you do not guess names and burn
+     compile-fix retries. Create or update the test file(s) and run a filtered
+     incremental test command (`--filter` / `--no-restore`; pass `--no-build`
+     only after an explicit build of the current edits) for the RED check.
+  3. **Batch edits — GREEN:** Emit non-overlapping `write_file` / `edit_file`
+     calls across **all** distinct implementation files in a **single parallel
+     turn** (only multiple non-adjacent edits to the *same* file require
+     separate turns).
+  4. **Fast inner loop, one final GREEN suite:** Use filtered incremental test
+     runs (`--filter` / `--no-restore`, or `--no-build` only against freshly
+     built binaries) for inner-loop slices, then run the full test suite from
+     `architecture.md` plus any batched headless/runtime verification scripts
+     **once** at final GREEN. Aside from an incremental stub check in step 2,
+     do not run redundant clean/full builds, `git status`, `rm`, or `find`
+     commands unless diagnosing a failure.
+  5. **Batch bookkeeping:** Append the `## Build note` (including any concise,
+     repo-wide `### Tooling / Invariant candidates`) to the epic file and set
+     the epic to `built` in `docs/sdlc/state.md` in a **single parallel turn**,
+     then return immediately.
 - The return format below.
 
 A subagent cannot ask the user a question. At any stop, it returns instead:
@@ -144,6 +202,7 @@ A subagent cannot ask the user a question. At any stop, it returns instead:
 status: green | stuck | conflict | needs-command
 tests added: <count>
 files changed: <paths>
+suite: <exact full-suite command and summary line>
 detail: <the failing test, the contradiction, or the exact command and its hazard>
 ```
 
@@ -152,14 +211,14 @@ Act on the status:
 | Status | What the main context does |
 |---|---|
 | `green` | Step 2, the review. |
-| `needs-command` | Ask the user, as the stop table requires. On a yes, run the command, then continue the same agent with `SendMessage`. On a no, stop the run. |
+| `needs-command` | Ask the user, as the stop table requires. On a yes, run the command, then continue the same subagent `conversationId` with `send_message`. On a no, stop the run. |
 | `stuck` | Stop. See the stop table. |
 | `conflict` | Stop. See the stop table. |
 
 Check the agent's claim. A `green` with no build note in the epic file, or an
 epic not set to `built`, is not green. Treat it as `stuck`.
 
-If the Agent tool is not available, build in the main context, as
+If `invoke_subagent` is not available, build in the main context, as
 [build-epic](../build-epic/SKILL.md) describes.
 
 ### The line per epic
@@ -204,7 +263,7 @@ Stop at the first of these. Report where the run got to, then close.
 | A review fails twice on one epic | See above. |
 | `git merge` conflicts | `push-epic` never resolves a conflict. |
 | The suite goes red before a merge | A red suite blocks the merge, whatever the review said. |
-| A commit would include a file no build note names | The gate covered the epics' files, not that one. Ask. |
+| A commit would include a file no build note names (aside from `AGENTS.md` / `CLAUDE.md` invariant promotions) | The gate covered the epics' files and confirmed invariant promotions, not unrelated files. Ask. |
 | The user interrupts | Their turn always wins. |
 
 Only the infrastructure question resumes the same run. The rest end it. Say the
@@ -217,7 +276,7 @@ agent decides it and records it in the build note. Put this rule in its prompt.
 
 ## The review digest
 
-Collect, for every epic the loop touched, four things as they happen. Write
+Collect, for every epic the loop touched, five things as they happen. Write
 nothing to the user until the run ends.
 
 1. **The verdict**, and the date the review ran.
@@ -227,6 +286,9 @@ nothing to the user until the run ends.
    these.
 4. **The deviations** the build note records, and any finding a `pass` verdict
    raised but did not block on.
+5. **Tooling / Invariant candidates** surfaced in build notes, and whether each
+   was promoted into `AGENTS.md` / `CLAUDE.md` (or discarded as volatile or
+   duplicate).
 
 The epic files already carry every review block. The digest repeats them in one
 place so the user reads the phase in one sitting, and does not open five files.
@@ -236,7 +298,8 @@ merged epic with an open finding is the exact thing the digest exists to show.
 
 ## The report
 
-At the end of the run, print the ledger, then the digest, and nothing else:
+At the end of the run, print the ledger, then the digest (including `Tooling /
+Invariants` when any candidates appeared), and nothing else:
 
 ```
 Phase 02 — search. 4 of 5 epics merged into main.
@@ -256,6 +319,9 @@ Reviews
              test_cache_evicts_oldest
   epic-05  fail twice on AC-3. Not merged. The spec and the code disagree
              about what an empty facet returns.
+
+Tooling / Invariants
+  epic-03  promoted to AGENTS.md: <one-line repo-wide rule or flag>
 ```
 
 Six lines of prose or fewer above the ledger. The ledger and the digest carry
@@ -296,7 +362,8 @@ When the last phase merged, say the project is done.
 - It does not delete a branch, force push, or rewrite history.
 - It does not land an epic that failed review.
 - It does not change the epic spec, `phases.md`, or `architecture.md`.
-- It does not commit a file that the epics do not touch.
+- It does not commit a file that the epics do not touch (aside from confirmed
+  `Tooling / Invariant` promotions into `AGENTS.md` or `CLAUDE.md`).
 - It does not open a pull request. Use `/sdlc:build-epic` and `/sdlc:review` by
   hand when another person reviews the code.
 

@@ -77,9 +77,10 @@ Gates       Stages 1 to 5 end with "Approve <stage>, or what should change?"
             list once, then runs to green without a stop. /sdlc:loop-phase
             folds the gates of stages 5 to 8 into one question, up front.
 
-Git         Only /sdlc:push-epic runs a git write command, and it asks once
-            first. Every other stage leaves changes in the working tree.
-            Each epic gets its own branch, epic-NN-<slug>. No force push,
+Git         /sdlc:plan-phase drafts on plan/phase-NN-<slug> (in a worktree
+            when phases.md is committed) and merges locally on approval.
+            Each epic gets its own branch, epic-NN-<slug>, and /sdlc:push-epic
+            commits, pushes, and merges it after asking once. No force push,
             no history rewrite, no merge of a failed review.
 
 Order       Every skill checks its preconditions. If an earlier stage is not

@@ -20,7 +20,10 @@ Read, in full:
 - `docs/sdlc/phase-NN-<slug>/test-plan.md`
 - `docs/sdlc/architecture.md` — the `## Stack` block gives the test command
 - `docs/sdlc/design.md`, if it exists and this epic touches the UI
-- `CONTEXT.md` and `docs/adr/`, if they exist
+- `AGENTS.md` and `CLAUDE.md` (if they exist) for stable repo/tooling rules and
+  test flags
+- `CONTEXT.md` (if it exists, strictly for domain glossary terms) and
+  `docs/adr/`
 
 When `design.md` exists, build the UI from its tokens and its component list.
 Do not invent a colour, a spacing value, or a component it does not name. If
@@ -100,22 +103,48 @@ last line, nothing after it.
 
 Follow [TDD-LOOP.md](TDD-LOOP.md). In short, per slice:
 
-1. Write the failing test. Run it. Watch it fail for the right reason.
+1. Verify exact existing enum/record/module signatures first (or compile
+   minimal unimplemented public type/interface stubs as part of Slice 1 RED)
+   before generating multi-test integration suites against new types/DTOs.
+   Write the failing test. Run it. Watch it fail for the right reason.
 2. Write the smallest code that passes it.
-3. Run the full suite.
-4. Refactor while the suite stays green.
+3. Use filtered incremental test runs (`--filter` / `--no-restore` after edits;
+   pass `--no-build` only when binaries were already built for the current
+   edits) for inner-loop slices, and run the full suite plus any batched
+   headless/runtime verification scripts once at final GREEN.
+4. Refactor while tests stay green.
 
 Slice 1 is the tracer bullet: the thinnest line through every layer this epic
 touches.
 
 ### Parallel tool batching
 
-Always batch independent tool calls into a single turn rather than emitting one tool call per turn:
+Always batch independent tool calls into a single turn rather than emitting one
+tool call per turn:
 
-1. **Batch reads:** Read the epic file, `state.md`, and all existing files listed in the epic's `## Files` section in a **single parallel turn**. Do not read files one by one across separate turns.
-2. **Batch writes across distinct files:** When creating or editing multiple distinct files for a slice, emit all `write_to_file` / `replace_file_content` calls for different files in a **single parallel turn**.
-3. **No unrequested shell commands:** Run only the test command from `architecture.md`. Do not run extra `build`, `find`, `git status`, or cleanup commands unless diagnosing a test failure.
-4. **Batch bookkeeping:** When the suite is green, append the build note to the epic file and update `docs/sdlc/state.md` in a **single parallel turn**.
+1. **Orient and batch reads:** Read the epic file, `state.md`, `AGENTS.md` /
+   `CLAUDE.md`, `CONTEXT.md`, and known small files (`<= 300` lines) from
+   `## Files` in a **single parallel turn**. For files over ~300 lines (check
+   with `wc -l` + `rg -n` in one command when unsure), locate target
+   symbols/sections with `rg -n` first, then batch parallel `read_file` calls
+   with explicit line ranges (`<= 400` lines per chunk) instead of triggering
+   truncation or reading large files in many sequential small chunks across
+   turns.
+2. **Batch writes across distinct files:** When creating or editing multiple
+   distinct files for a slice, emit all non-overlapping `write_file` /
+   `edit_file` calls for different files in a **single parallel turn**.
+3. **Fast inner-loop tests, one full-suite GREEN run:** Use filtered
+   incremental test runs (`--filter` / `--no-restore`) after code or test
+   edits, and pass `--no-build` only after an explicit build of the current
+   edits (never against stale binaries). Run the full test suite from
+   `architecture.md` plus any batched headless/runtime verification scripts
+   once at final GREEN. A single fast incremental build/typecheck is fine when
+   verifying Slice 1 public type/DTO stubs; otherwise do not run redundant
+   clean/full builds, `find`, `git status`, or cleanup commands unless
+   diagnosing a failure.
+4. **Batch bookkeeping:** When the final full suite is green, append the build
+   note to the epic file and update `docs/sdlc/state.md` in a **single parallel
+   turn**.
 
 ## When to stop early
 
@@ -135,9 +164,11 @@ Never mark an epic green while a test fails. Never skip a test to reach green.
 
 ## Pre-existing failures
 
-Run the full suite before slice 1. If tests already fail, list them, then end
-the message with: **Fix these first?** Reply `yes`, or `later` to build on a
-red suite.
+In a standalone run, run the full suite before slice 1 (skip this pre-check
+inside `/sdlc:loop-phase`, where Precondition 3 and each prior merged epic
+already verified `<default>` is green). If tests already fail, list them, then
+end the message with: **Fix these first?** Reply `yes`, or `later` to build on
+a red suite.
 
 The user's rules say to fix all failing tests, not only the ones you caused. Do
 not build on a red suite without saying so.
@@ -154,6 +185,11 @@ Record honestly:
 - The exact command run, and the summary line of its output.
 - Every deviation from the spec, and why. "None" is a valid answer.
 - Every follow-up you chose not to do.
+- Under `### Tooling / Invariant candidates` (optional): record only newly
+  discovered, repo-wide build/test flags, compiler/runtime traps, or hard
+  invariants worth promoting to `AGENTS.md` / `CLAUDE.md`. Never record
+  volatile line numbers or file inventories (keep root rule files under ~50
+  lines). Omit or write `None` when nothing new turned up.
 
 Then set the epic to `built` in `state.md`.
 

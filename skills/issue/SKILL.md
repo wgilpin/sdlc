@@ -56,8 +56,9 @@ Read, in this order, and stop as soon as you can place the issue:
    contradiction.
 
 Then decide one thing: **is the behaviour built?** Do not answer from the
-documents alone. Read the code that owns the behaviour. Use the Explore
-subagent when the surface is wide.
+documents alone. Read the code that owns the behaviour. Use the `research`
+subagent (`invoke_subagent` with `TypeName: "research"`) when the surface is
+wide.
 
 An epic that is `merged` or `reviewed` is built. An epic that is `built` is
 built but not landed. Everything else is not built.

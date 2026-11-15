@@ -57,11 +57,21 @@ whatever the state file says.
    against the default branch for `.env*` files, private keys, local database
    files (`.db`, `.sqlite*`), or hard-coded API keys, tokens, and passwords.
    If any are present, list the file and line, refuse to stage them, and stop.
-3. **The tests.** Run the full suite from the `## Stack` block in
-   `architecture.md`. A red suite blocks the merge. Report the failure and
-   stop. Do not merge on the strength of a review that ran earlier.
+3. **The tests.** In a standalone run, run the full suite from the `## Stack`
+   block in `architecture.md`. A red suite blocks the merge; do not merge on
+   the strength of a review that ran earlier. Inside `/sdlc:loop-phase`, reuse
+   the builder's verified full-suite pass when no code, build/config, or test
+   files changed since that run (only `docs/sdlc/` bookkeeping or `AGENTS.md` /
+   `CLAUDE.md`) and the runner requires no separate pre-merge check.
 4. **The default branch moved.** Fetch, then check whether the default branch
    has commits the epic branch lacks. Say so, because the merge can conflict.
+5. **Tooling / Invariant candidates.** Read `### Tooling / Invariant
+   candidates` in the epic's build note, plus `AGENTS.md` and `CLAUDE.md` if
+   present. Discard volatile line numbers, file inventories, and duplicates
+   already covered. Select the repo's root rule file (`AGENTS.md`, or
+   `CLAUDE.md` when `CLAUDE.md` exists and `AGENTS.md` does not; create
+   `AGENTS.md` if neither exists — never write tooling rules into
+   `CONTEXT.md`), and consolidate if needed so the file stays under ~50 lines.
 
 ## The commit message
 
@@ -106,26 +116,38 @@ Show, in this order:
 2. `git diff --stat` against the default branch.
 3. The commit message in full.
 4. The suite result.
+5. Exact `Tooling / Invariant` line(s) and target file (`AGENTS.md` or
+   `CLAUDE.md`) to promote, or `None`.
 
 Then end the message with these two blocks, in this order, and nothing after
-them:
+them (when item 5 is `None`):
 
 > WARNING: This commits, pushes, and merges into `<default>`. One command does
 > not undo it.
 >
 > **Land `epic-NN`?** Reply `yes` to run the sequence, or `no` to stop.
 
+When item 5 proposes invariant line(s), keep the `WARNING:` block above and
+replace the question line with:
+
+> **Land `epic-NN`?** Reply `yes` to land and promote the invariant, `land only`
+> to skip the invariant, or `no` to stop.
+
 The question is the last line. No `Next` block, no summary, no note. See
 [ASKING.md](../status/ASKING.md).
 
-Wait for a clear yes. A question in reply is not a yes.
+Wait for a clear yes (or `land only`). A question in reply is not a yes.
 
 ## The sequence
 
 Run these in order. Stop at the first failure and report it. Never force
 anything.
 
-1. `git add` the files the epic touched. Add named files, never `.`.
+1. When invariant promotion is approved (`yes` with candidates, or confirmed
+   inside `/sdlc:loop-phase`), write the confirmed line(s) into `AGENTS.md` /
+   `CLAUDE.md` (keeping the file under ~50 lines), then `git add` that file and
+   the named files the epic touched. On `land only` (or when item 5 is `None`),
+   `git add` only the named files the epic touched. Never `git add .`.
 2. `git commit` with the message above.
 3. `git push -u origin <epic branch>`, when a remote exists.
 4. `git checkout <default>`
@@ -175,7 +197,8 @@ phase instead.
 - It does not force push. It never rewrites history.
 - It does not resolve a merge conflict.
 - It does not land an epic that failed review.
-- It does not commit work that the epic does not cover.
+- It does not commit work that the epic does not cover (aside from approved
+  `Tooling / Invariant` promotions into `AGENTS.md` or `CLAUDE.md`).
 - It does not tag or release.
 
 ## Reference

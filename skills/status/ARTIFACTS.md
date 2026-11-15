@@ -359,6 +359,13 @@ second. Stage 7 appends the third. Nothing rewrites an earlier block.
 
 ### Follow-ups
 
+### Tooling / Invariant candidates
+
+<Optional. Newly discovered, repo-wide build/test flags, compiler or runtime
+traps, or hard invariants worth keeping in AGENTS.md / CLAUDE.md. Never record
+volatile line numbers or file inventories; keep candidates concise so root rule
+files stay under ~50 lines. Omit or write "None" if none.>
+
 ---
 
 ## Review — <YYYY-MM-DD>
