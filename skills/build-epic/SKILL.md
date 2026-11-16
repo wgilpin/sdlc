@@ -11,8 +11,10 @@ argument-hint: "[epic number or slug — 01, or 01-upload]"
 ## Preconditions
 
 Read `docs/sdlc/state.md`. Find the epic. It must exist and must not be
-`reviewed`. If the epic file is absent, name the phase and offer
-`/sdlc:plan-phase`. Stop.
+`reviewed`. If the epic file is absent, name the phase and close with the
+interactive menu from [NEXT-STEPS.md](../status/NEXT-STEPS.md) offering
+`(Recommended) /sdlc:plan-phase NN — plan the phase first` and
+`Stop here — do nothing now`.
 
 Read, in full:
 
@@ -73,9 +75,13 @@ One branch per epic. Never build on the default branch.
    `git symbolic-ref --quiet refs/remotes/origin/HEAD`. When there is no
    remote, use `main` if it exists, else `master`.
 2. Check the working tree. If it is dirty with changes from other work, list
-   them, then end the message with: **What do I do with these changes?** Reply
-   `stash`, `carry` to take them onto the epic branch, or name the files to
-   drop. Do not stash without an answer.
+   them, then ask what to do using the interactive question tool from
+   [ASKING.md](../status/ASKING.md) (`ask_question` / `AskUserQuestion`, with
+   plain-text fallback):
+   - `(Recommended) Stash changes — git stash before branching`
+   - `Carry changes — bring onto epic branch`
+   (The user can also select `Other` to name files to drop.) Do not stash
+   without an answer.
 3. If the current branch is already `epic-NN-<slug>` for this epic, stay on it
    and say so. A second run of the same epic continues its branch.
 4. Otherwise create `epic-NN-<slug>` from the default branch. Pull the default
@@ -96,8 +102,8 @@ Then end the message with this line, and nothing after it:
 After approval, run to green without another stop. Set the epic to `building`
 in `state.md`.
 
-Every ask in this skill follows [ASKING.md](../status/ASKING.md): one question,
-last line, nothing after it.
+Every plain-text ask in this skill follows [ASKING.md](../status/ASKING.md): one
+question, last line, nothing after it.
 
 ## The loop
 
@@ -195,53 +201,55 @@ Then set the epic to `built` in `state.md`.
 
 ## Report
 
-Six lines or fewer. Say: green or blocked, how many tests were added, the suite
-result, and any deviation.
+Print this in the message text right before closing so the user knows what
+shipped before answering the menu:
 
-List the changed files so the user can commit them.
+- What behaviour was built (1–3 short bullets).
+- Status (`green` or `blocked`), tests added, the suite summary line, and any
+  deviation.
+- Changed files so the user can inspect or commit them.
 
 ## Close
 
-**On green, ask for the review.** A built epic is not a finished epic, and a
-`Next` line is easy to walk past. End the message with the question and nothing
-after it, as [ASKING.md](../status/ASKING.md) requires:
+**On green, close with the review menu.** Print the `Uncommitted:` reminder at
+the end of the report:
 
 ```
 Uncommitted: 6 files changed. Commit before you continue.
-
-**Review `epic-03` now?** Reply `yes` to run the three passes, or `no` to stop
-here.
 ```
 
-On a `yes`, do [review](../review/SKILL.md) in full — all three passes — and
-close from there. On a `no`, warn the user that the review was skipped and
-print the block from [NEXT-STEPS.md](../status/NEXT-STEPS.md) in the next
-message:
+Then invoke the interactive next-step menu from
+[NEXT-STEPS.md](../status/NEXT-STEPS.md):
+
+- `(Recommended) /sdlc:review 03 — run three review passes`
+- `Pause before review — leave epic-03 unreviewed`
+- `/sdlc:status — see the whole project`
+
+When the user picks `/sdlc:review 03`, run [review](../review/SKILL.md) in full
+— all three passes — and close from there. When the user picks `Pause before
+review` (or stops via `Other`), print the skipped-review warning and end the
+turn:
 
 ```
 WARNING: `epic-03` has not been reviewed. Spec conformance, drift, and
 security checks have not run, and `/sdlc:push-epic` will refuse to land it.
-
-Next
-  → /sdlc:review 03        check it against the spec
-    /sdlc:status           see the whole project
 ```
 
-The epic stays `built` either way. Only the review moves it on, and
-`/sdlc:push-epic` refuses a `built` epic. Never skip the question to save a
-turn.
+The epic stays `built` until reviewed, and `/sdlc:push-epic` refuses a `built`
+epic.
 
 **Inside `/sdlc:loop-phase`, do not ask.** A subagent runs this skill there.
 The loop gate already covers the task list and the review. At any stop, the
 subagent returns a status to the loop instead of asking. The loop's
 `## The build agent` section gives the format.
 
-On `blocked`, do not ask, and recommend nothing downstream. Say what failed,
-then offer the one action that unblocks it. `/sdlc:review` never runs on a
-blocked epic.
+On `blocked`, state what failed in the message text and never offer
+`/sdlc:review`. Close with `(Recommended) Stop here — inspect failure first` and
+`/sdlc:build-epic 03 — retry after unblocking`.
 
-On a conflict with `architecture.md`, make `/sdlc:architect` the
-recommendation and name the contradiction.
+On a conflict with `architecture.md`, name the contradiction in the message and
+offer `(Recommended) /sdlc:architect — resolve architecture conflict` and
+`Stop here — inspect conflict`.
 
 ## What this skill does not do
 
@@ -251,12 +259,14 @@ recommendation and name the contradiction.
 - It does not change the epic spec, `phases.md`, or `architecture.md`.
 - It does not run `docker`, `alembic`, or any infrastructure command without
   asking first.
-- It does not review its own work. That is `/sdlc:review`.
+- It does not review its own work unless the user selects `/sdlc:review` from
+  the closing menu.
 
 ## Reference
 
-- [ASKING.md](../status/ASKING.md) — how to ask: one question, last line,
-  nothing after it.
+- [ASKING.md](../status/ASKING.md) — plain-text questions and gates vs.
+  interactive menus.
+- [NEXT-STEPS.md](../status/NEXT-STEPS.md) — the interactive closing menu.
 - [TDD-LOOP.md](TDD-LOOP.md) — the loop, the seam rules, and the mocking rules.
 - [ARTIFACTS.md](../status/ARTIFACTS.md) — the build note block.
 - [STATE-FORMAT.md](../status/STATE-FORMAT.md) — the state file and its rules.

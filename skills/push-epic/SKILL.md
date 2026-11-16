@@ -133,8 +133,8 @@ replace the question line with:
 > **Land `epic-NN`?** Reply `yes` to land and promote the invariant, `land only`
 > to skip the invariant, or `no` to stop.
 
-The question is the last line. No `Next` block, no summary, no note. See
-[ASKING.md](../status/ASKING.md).
+The question is the last line. Do not call the next-steps menu here; no summary
+or note follows the question. See [ASKING.md](../status/ASKING.md).
 
 Wait for a clear yes (or `land only`). A question in reply is not a yes.
 
@@ -172,23 +172,22 @@ yourself. The user decides.
    > **Delete the branch `epic-NN-<slug>`?** Reply `yes` to delete it locally
    > and on the remote, or `keep`.
 
-   Delete it only on a yes. This is the last message of the run, so the `Next`
-   block waits until the user answers.
+   Delete it only on a yes. This plain-text ask comes before the close, so the
+   interactive next-steps menu waits until the user answers.
 
 ## Close
 
-End with the block from [NEXT-STEPS.md](../status/NEXT-STEPS.md):
+Print the merge summary (`Landed epic-03 on main. Phase 02: 5 of 6 epics
+merged.`), then invoke the interactive next-step menu from
+[NEXT-STEPS.md](../status/NEXT-STEPS.md):
 
-```
-Landed epic-03 on main. Phase 02: 5 of 6 epics merged.
+- `(Recommended) /sdlc:build-epic 06 — build the last epic`
+- `/sdlc:status — see the whole project`
 
-Next
-  → /sdlc:build-epic 06    build the last epic
-    /sdlc:status           see the whole project
-```
-
-When the merge finished the phase, recommend `/sdlc:plan-phase` for the next
-phase instead.
+When the merge finished the phase and another phase remains, recommend
+`/sdlc:plan-phase <next>` instead. When no phase remains, say the project is
+done and offer `(Recommended) Done — finish the run` and
+`/sdlc:status — view final record`.
 
 ## What this skill does not do
 
@@ -203,6 +202,7 @@ phase instead.
 
 ## Reference
 
-- [ASKING.md](../status/ASKING.md) — how to ask, and where the question goes.
-- [NEXT-STEPS.md](../status/NEXT-STEPS.md) — the close block.
+- [ASKING.md](../status/ASKING.md) — plain-text questions and gates vs.
+  interactive menus.
+- [NEXT-STEPS.md](../status/NEXT-STEPS.md) — the interactive closing menu.
 - [STATE-FORMAT.md](../status/STATE-FORMAT.md) — the state file and its rules.

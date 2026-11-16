@@ -188,27 +188,30 @@ List the changed files so the user can commit them.
 
 ## Close
 
-Give the count from `state.md` in one line, then the block from
-[NEXT-STEPS.md](../status/NEXT-STEPS.md).
+Print the phase count from `state.md` in one line (`Phase 02: 5 of 6 epics
+reviewed.`) and the `Uncommitted:` reminder, then invoke the interactive
+next-step menu from [NEXT-STEPS.md](../status/NEXT-STEPS.md).
 
 On `pass`:
 
-```
-Phase 02: 5 of 6 epics reviewed.
+- `(Recommended) /sdlc:push-epic 05 — land it on main`
+- `/sdlc:build-epic 06 — build next epic first`
 
-Next
-  → /sdlc:push-epic 05     land it on main
-    /sdlc:build-epic 06    build the last epic first
-```
+When no pending epic remains in the phase, offer `/sdlc:status — see the whole
+project` as the second option. A passing epic still sits on its own branch, so
+landing it comes before starting the next epic.
 
-A passing epic still sits on its own branch. Landing it comes before the next
-epic, so the next branch starts from current code.
+On `pass with follow-ups`, print the follow-ups as a numbered list above the
+`Uncommitted:` line, then offer the same menu as `pass`.
 
-On `pass with follow-ups`, recommend the same next epic, and put the follow-ups
-above the block as a numbered list.
+On `fail`, name the criterion that failed in the message text, then offer:
 
-On `fail`, recommend `/sdlc:build-epic <same epic>` to fix what failed. Name
-the criterion that failed. Never recommend the next epic after a `fail`.
+- `(Recommended) /sdlc:build-epic 05 — fix failed criteria`
+- `/sdlc:status — see the whole project`
+
+When the same epic has now failed review twice, add
+`/sdlc:respec epic 05 — rewrite spec from scratch`. Never offer the next epic
+after a `fail`.
 
 ## What this skill does not do
 
@@ -220,7 +223,8 @@ the criterion that failed. Never recommend the next epic after a `fail`.
 
 ## Reference
 
-- [ASKING.md](../status/ASKING.md) — how to ask: one question, last line,
-  nothing after it.
+- [ASKING.md](../status/ASKING.md) — plain-text questions and gates vs.
+  interactive menus.
+- [NEXT-STEPS.md](../status/NEXT-STEPS.md) — the interactive closing menu.
 - [ARTIFACTS.md](../status/ARTIFACTS.md) — the review block.
 - [STATE-FORMAT.md](../status/STATE-FORMAT.md) — the state file and its rules.

@@ -114,28 +114,28 @@ Then end the message with this line, and nothing after it:
 
 > **Approve `architecture`?** Reply `yes`, or tell me what to change.
 
-No `Next` block follows the question. See
+Do not call the next-steps menu in the gate turn. See
 [ASKING.md](../status/ASKING.md).
 
 On approval, set `architecture` to `approved <today's date>`.
 
 ## Close
 
-End with the block from [NEXT-STEPS.md](../status/NEXT-STEPS.md). After
-approval it reads:
+Print the `Uncommitted:` reminder when files changed, then invoke the
+interactive next-step menu from [NEXT-STEPS.md](../status/NEXT-STEPS.md):
 
-```
-Next
-  → /sdlc:phases           decide the build order
-    /sdlc:design           settle the UI first
-    /sdlc:explore          the concept has a hole
-```
+- `(Recommended) /sdlc:phases — decide the build order`
+- `/sdlc:design — settle the UI first`
+- `/sdlc:explore — concept has a hole`
 
-Offer `/sdlc:design` only when the project has a user interface. Say it is
-optional.
+Offer `/sdlc:design` only when the project has a user interface (it is
+optional). Offer `/sdlc:explore` only when a gap surfaced; otherwise use
+`/sdlc:status — see the whole project` so at least two options appear.
 
-When you proposed a spike, make the spike the recommendation instead. Name the
-question it answers and say `/sdlc:phases` waits for the answer.
+When you proposed a spike, state the question it answers and that
+`/sdlc:phases` waits for the result, then offer
+`(Recommended) Stop here — run the spike first` and
+`/sdlc:status — see the whole project`.
 
 ## What this skill does not do
 
@@ -148,8 +148,9 @@ question it answers and say `/sdlc:phases` waits for the answer.
 
 ## Reference
 
-- [ASKING.md](../status/ASKING.md) — how to ask: one question, last line,
-  nothing after it.
+- [ASKING.md](../status/ASKING.md) — plain-text questions and gates vs.
+  interactive menus.
+- [NEXT-STEPS.md](../status/NEXT-STEPS.md) — the interactive closing menu.
 - [ARTIFACTS.md](../status/ARTIFACTS.md) — the `architecture.md` and ADR
   templates.
 - [STATE-FORMAT.md](../status/STATE-FORMAT.md) — the state file and its rules.

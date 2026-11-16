@@ -99,24 +99,23 @@ Then end the message with this line, and nothing after it:
 
 > **Approve `phases`?** Reply `yes`, or tell me what to change.
 
-No `Next` block follows the question. See
+Do not call the next-steps menu in the gate turn. See
 [ASKING.md](../status/ASKING.md).
 
 On approval, set `phases` to `approved <today's date>`.
 
 ## Close
 
-End with the block from [NEXT-STEPS.md](../status/NEXT-STEPS.md). After
-approval it reads:
+Print the `Uncommitted:` reminder when files changed, then invoke the
+interactive next-step menu from [NEXT-STEPS.md](../status/NEXT-STEPS.md):
 
-```
-Next
-  → /sdlc:plan-phase 01    epics and tests for phase 1
-    /sdlc:architect        the architecture has a gap
-```
+- `(Recommended) /sdlc:plan-phase 01 — epics and test plan`
+- `/sdlc:loop-phase 01 — plan, build, and land`
+- `/sdlc:architect — architecture has a gap`
 
 Always name the phase number in the command. Recommend `/sdlc:plan-phase` for
-the first phase that is not `done`, which is normally `01`.
+the first phase that is not `done`, which is normally `01`. Omit
+`/sdlc:architect` when no gap surfaced.
 
 Plan one phase at a time. Do not offer to plan them all.
 
@@ -139,7 +138,8 @@ the ordered list. Numbers never change once written. To drop a phase, mark it
 
 ## Reference
 
-- [ASKING.md](../status/ASKING.md) — how to ask: one question, last line,
-  nothing after it.
+- [ASKING.md](../status/ASKING.md) — plain-text questions and gates vs.
+  interactive menus.
+- [NEXT-STEPS.md](../status/NEXT-STEPS.md) — the interactive closing menu.
 - [ARTIFACTS.md](../status/ARTIFACTS.md) — the `phases.md` template.
 - [STATE-FORMAT.md](../status/STATE-FORMAT.md) — the state file and its rules.

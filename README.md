@@ -78,6 +78,10 @@ Then install the plugin and restart the session:
 claude plugin install sdlc@will
 ```
 
+In Antigravity, load the `skills/` folders directly — every `/sdlc:<skill>`
+command in the chain maps to the `<skill>` skill (`concept`, `architect`,
+`build-epic`, and so on) without the prefix.
+
 ## What it writes
 
 ```
@@ -154,31 +158,30 @@ The output is a parallel tree, `docs/sdlc-v2/`, in the same layout as
 untouched. The old tree stays as history. `/sdlc:respec` writes the spec and
 stops — it never starts the rebuild.
 
-## How the chain asks
+## How the chain asks and closes
 
-One rule, so you always know whose turn it is:
+Every turn ends in one of two ways, so you never wonder whose turn it is:
 
-**A question is the last line of the message. Nothing follows it.**
+**Plain-text questions and gates end on a bold last line.** Interview
+questions, `Approve <stage>?` gates, and destructive confirmations sit on the
+last line of the message, in bold, naming the answer you can give. Nothing
+follows the question — no summary, no closing note, and no next-step menu. One
+question per message; a skill with three offers asks across three messages. See
+`skills/status/ASKING.md`.
 
-The question is bold, it ends with a question mark, and it names the answer you
-can give. No `Next` block, no summary, and no closing note follows it. One
-question per message — a skill with three offers asks three times.
+**Non-question turns close with an interactive next-step menu.** When a stage
+finishes or reports without a plain-text question, it invokes the host's
+multiple-choice question tool (`ask_question` in Antigravity /
+`AskUserQuestion` in Claude Code, with a plain-text fallback if neither is
+available):
 
-So the absence of a question means the turn is yours. `skills/status/ASKING.md`
-holds the rule and its examples.
+- `(Recommended) /sdlc:build-epic 06 — build the last epic`
+- `/sdlc:status — see the whole project`
 
-A message that asks nothing ends with the same block, so you never work out
-what runs next:
-
-```
-Next
-  → /sdlc:build-epic 06    build the last epic
-    /sdlc:status           see the whole project
-```
-
-The arrow marks the recommendation. The other lines are the branches that are
-genuinely open. A skill never recommends a step that its own preconditions
-block.
+The recommended step comes first, with 2–4 valid options and a short reason
+(`<= 4` words) on each. Selecting an option launches that stage immediately. A
+skill never offers a step whose preconditions are not met. See
+`skills/status/NEXT-STEPS.md`.
 
 ## What the chain never does
 

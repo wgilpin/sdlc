@@ -30,7 +30,10 @@ End your first message with this line, and nothing after it:
 > `yes`, or `no` to skip this stage.
 
 If the answer is no, say this stage does not apply, set nothing, and close with
-`/sdlc:phases`. Do not write `design.md` for a library or a CLI.
+the interactive menu from [NEXT-STEPS.md](../status/NEXT-STEPS.md) offering
+`(Recommended) /sdlc:phases — decide the build order` and
+`/sdlc:status — see the whole project`. Do not write `design.md` for a library
+or a CLI.
 
 A CLI with rich terminal output is a borderline case. Run the stage only when
 the user asks for it.
@@ -174,21 +177,21 @@ Then end the message with this line, and nothing after it:
 
 > **Approve `design`?** Reply `yes`, or tell me what to change.
 
-No `Next` block follows the question. See
+Do not call the next-steps menu in the gate turn. See
 [ASKING.md](../status/ASKING.md).
 
 On approval, set `design` to `approved <today's date>`.
 
 ## Close
 
-End with the block from [NEXT-STEPS.md](../status/NEXT-STEPS.md). After
-approval it reads:
+Print the `Uncommitted:` reminder when files changed, then invoke the
+interactive next-step menu from [NEXT-STEPS.md](../status/NEXT-STEPS.md):
 
-```
-Next
-  → /sdlc:phases           decide the build order
-    /sdlc:architect        the stack fights the design
-```
+- `(Recommended) /sdlc:phases — decide the build order`
+- `/sdlc:architect — stack fights the design`
+
+Offer `/sdlc:architect` when the UI work exposed a stack problem; otherwise
+offer `/sdlc:status — see the whole project`.
 
 ## What this skill does not do
 
@@ -201,7 +204,9 @@ Next
 
 ## Reference
 
-- [ASKING.md](../status/ASKING.md) — how to ask. This stage asks four times,
-  in four messages. Never bundle them.
+- [ASKING.md](../status/ASKING.md) — plain-text questions and gates vs.
+  interactive menus. This stage asks four plain-text questions across four
+  messages; never bundle them.
+- [NEXT-STEPS.md](../status/NEXT-STEPS.md) — the interactive closing menu.
 - [ARTIFACTS.md](../status/ARTIFACTS.md) — the `design.md` template.
 - [STATE-FORMAT.md](../status/STATE-FORMAT.md) — the state file and its rules.

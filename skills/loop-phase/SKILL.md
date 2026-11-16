@@ -46,9 +46,13 @@ in its own message, and each follows [ASKING.md](../status/ASKING.md).
    without an answer. On `no`, stop the run — a loop with no way back is a bad
    trade.
 2. **A clean tree.** Run `git status --short`. If changes from other work are
-   present, list them, then end the message with: **What do I do with these
-   changes?** Reply `stash`, `carry` onto the first epic branch, or name the
-   files to drop.
+   present, list them, then ask what to do using the interactive question tool
+   from [ASKING.md](../status/ASKING.md) (`ask_question` / `AskUserQuestion`,
+   with plain-text fallback):
+   - `(Recommended) Stash changes — git stash before looping`
+   - `Carry changes — bring onto first epic`
+   (The user can also select `Other` to name files to drop.)
+
 3. **A green suite.** Run the full suite from the `## Stack` block in
    `architecture.md`. If tests already fail, list them, then end the message
    with: **Fix these first?** Reply `yes`, or `later` to loop on a red suite.
@@ -98,8 +102,8 @@ them:
 > **Run the loop for phase NN?** Reply `yes` to build, review, and land all N
 > epics, or `no` to stop.
 
-The question is the last line. No `Next` block, no summary. Wait for a clear
-yes. A question in reply is not a yes.
+The question is the last line. Do not call the next-steps menu here; nothing
+follows the question. Wait for a clear yes. A question in reply is not a yes.
 
 This yes is the explicit permission the user's git rules require. It covers
 every commit, push, and merge the run makes — including promoting confirmed,
@@ -200,6 +204,7 @@ A subagent cannot ask the user a question. At any stop, it returns instead:
 
 ```
 status: green | stuck | conflict | needs-command
+summary: <1-2 sentences naming the behaviour delivered and key modules touched>
 tests added: <count>
 files changed: <paths>
 suite: <exact full-suite command and summary line>
@@ -298,10 +303,34 @@ merged epic with an open finding is the exact thing the digest exists to show.
 
 ## The report
 
-At the end of the run, print the ledger, then the digest (including `Tooling /
-Invariants` when any candidates appeared), and nothing else:
+At the end of the run, print the work summary, then the fenced ledger and review
+digest, in the **same message text right before calling the closing menu** — the
+interactive question tool pauses the turn immediately, so the user needs the
+full picture above the prompt before answering:
 
-```
+1. **Work summary (`### What was built`):**
+   - One bullet per epic naming the user-visible behaviour delivered and the key
+     files or modules touched (using each build agent's `summary` and
+     `files changed`).
+   - One **Situation** bullet calling out anything that affects what to do next:
+     blocked or unmerged epics, manual `DC-N` walkthroughs remaining in
+     `test-plan.md`, open follow-up issues (`ISS-N`), or whether merges are
+     local-only vs. pushed to a remote.
+2. **Fenced ledger and review digest:** Always wrap the ledger, `Reviews`, and
+   `Tooling / Invariants` inside a fenced ` ```text ` code block so Markdown
+   preserves every line break instead of collapsing lines into a single
+   paragraph:
+
+````markdown
+### What was built — Phase 02 (search)
+
+- **epic-01-index:** Indexed uploaded documents for full-text search (`src/search/index.py`, `tests/test_index.py`).
+- **epic-02-query:** Added `/search` query route and result template (`src/routes/search.py`, `templates/search.html`).
+- **epic-03-rank:** Added BM25 title/tag ranking weights (`src/search/rank.py`).
+- **epic-04-cache:** Added LRU query cache invalidated on upload (`src/search/cache.py`).
+- **Situation:** Stopped on `epic-05-facets` (failed review twice on `AC-3`, unmerged); `ISS-7` logged to `issues.md`; `DC-6` manual UI check still pending.
+
+```text
 Phase 02 — search. 4 of 5 epics merged into main.
 
   epic-01-index    built 6 tests · review pass · merged
@@ -323,9 +352,7 @@ Reviews
 Tooling / Invariants
   epic-03  promoted to AGENTS.md: <one-line repo-wide rule or flag>
 ```
-
-Six lines of prose or fewer above the ledger. The ledger and the digest carry
-the detail.
+````
 
 ## The follow-ups
 
@@ -339,20 +366,22 @@ are the next run's input.
 
 ## Close
 
-End with the block from [NEXT-STEPS.md](../status/NEXT-STEPS.md).
+After emitting `## The report` above in your message text, immediately invoke
+the interactive next-step menu from [NEXT-STEPS.md](../status/NEXT-STEPS.md) in
+that same turn (never call the tool with an empty message body):
 
-When every epic merged:
+When every epic merged and another phase remains:
 
-```
-Next
-  → /sdlc:loop-phase 03    plan and build the next phase
-    /sdlc:status           see the whole project
-```
+- `(Recommended) /sdlc:loop-phase 03 — plan and build next`
+- `/sdlc:plan-phase 03 — plan next phase only`
+- `/sdlc:status — see the whole project`
 
-When the run stopped on an epic, recommend the skill that unblocks that epic,
-never the next phase. Name the epic and the reason in the line above the block.
+When the run stopped on an epic, name the epic and the reason in the message
+text before calling the tool, then recommend the skill that unblocks that epic
+(alongside `Stop here — inspect failure first`), never the next phase.
 
-When the last phase merged, say the project is done.
+When the last phase merged, say the project is done in the message and offer
+`(Recommended) Done — finish the run` and `/sdlc:status — view final record`.
 
 ## What this skill does not do
 
@@ -375,6 +404,6 @@ When the last phase merged, say the project is done.
 - [review](../review/SKILL.md) — step 3.2, and the three passes.
 - [push-epic](../push-epic/SKILL.md) — step 3.3, and the merge sequence.
 - [issue](../issue/SKILL.md) — the backlog route, for the follow-ups.
-- [ASKING.md](../status/ASKING.md) — how the three preconditions and the gate
-  ask.
+- [ASKING.md](../status/ASKING.md) — how the preconditions and the gate ask.
+- [NEXT-STEPS.md](../status/NEXT-STEPS.md) — the interactive closing menu.
 - [STATE-FORMAT.md](../status/STATE-FORMAT.md) — the state file and its rules.

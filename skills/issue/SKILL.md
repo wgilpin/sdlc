@@ -26,7 +26,10 @@ is the record. It is not a second source of truth for stage status.
 ## Preconditions
 
 Read `docs/sdlc/state.md`. If the file is absent, tell the user this project is
-not in the chain, offer `/sdlc:concept`, and stop.
+not in the chain, then close with the interactive menu from
+[NEXT-STEPS.md](../status/NEXT-STEPS.md) offering
+`(Recommended) /sdlc:concept — get the idea down` and
+`Stop here — do nothing now`.
 
 If `$ARGUMENTS` is empty, end the message with: **What is the issue?** Give me
 one or two sentences. Then stop.
@@ -143,7 +146,8 @@ Then end the message with the line for the route, and nothing after it:
 | Backlog | **Log this to the backlog?** Reply `yes`, or name the phase it belongs to. |
 | Backtrack | **Take this back to `architecture`?** Reply `yes`, or `log` to record it for later. |
 
-See [ASKING.md](../status/ASKING.md). No `Next` block follows a question.
+See [ASKING.md](../status/ASKING.md). Do not call the next-steps menu in a
+question turn.
 
 ## Step 5 — Act
 
@@ -190,35 +194,24 @@ An issue keeps its number for good. A dropped issue stays in the file with
 
 ## Close
 
-End with the block from [NEXT-STEPS.md](../status/NEXT-STEPS.md). Pick the
-recommendation from the route:
+When the fix or route left uncommitted files, print the `Uncommitted:` reminder
+first, then invoke the interactive next-step menu from
+[NEXT-STEPS.md](../status/NEXT-STEPS.md). Pick the options from the route:
 
 Fixed now, mid-epic:
 
-```
-Next
-  → /sdlc:build-epic 06    finish the epic
-    /sdlc:issue            report the next one
-```
+- `(Recommended) /sdlc:build-epic 06 — finish the epic`
+- `/sdlc:issue — report the next one`
 
 Routed into a pending epic:
 
-```
-Next
-  → /sdlc:build-epic 06    build the epic with the new AC
-    /sdlc:status           see the whole project
-```
+- `(Recommended) /sdlc:build-epic 06 — build with new AC`
+- `/sdlc:status — see the whole project`
 
 Logged to the backlog:
 
-```
-Next
-  → /sdlc:status           see where this project is
-    /sdlc:phases           the backlog needs a phase
-```
-
-When the fix changed code, put the uncommitted line above the block, as
-[NEXT-STEPS.md](../status/NEXT-STEPS.md) requires.
+- `(Recommended) /sdlc:status — see project position`
+- `/sdlc:phases — add a backlog phase`
 
 ## What this skill does not do
 
@@ -232,7 +225,9 @@ When the fix changed code, put the uncommitted line above the block, as
 
 ## Reference
 
-- [ASKING.md](../status/ASKING.md) — one question, last line, nothing after it.
+- [ASKING.md](../status/ASKING.md) — plain-text questions and gates vs.
+  interactive menus.
+- [NEXT-STEPS.md](../status/NEXT-STEPS.md) — the interactive closing menu.
 - [ARTIFACTS.md](../status/ARTIFACTS.md) — the epic, phase, and test plan
   templates this skill appends to.
 - [STATE-FORMAT.md](../status/STATE-FORMAT.md) — the status words and the

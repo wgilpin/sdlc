@@ -25,11 +25,15 @@ Read these files silently, in one pass. Do not report what you read.
 - `docs/sdlc/state.md`, if it exists
 
 If `state.md` exists and `concept` is `approved`, tell the user a concept
-already exists, then end the message with: **Which one — `deepen`, `replace`,
-or `move on`?** `deepen` runs `/sdlc:explore`, `replace` overwrites
-`concept.md`, `move on` runs `/sdlc:architect`.
+already exists, then ask how to proceed with the interactive question tool from
+[ASKING.md](../status/ASKING.md) (`ask_question` / `AskUserQuestion`, with
+plain-text fallback):
 
-Stop until they choose.
+- `(Recommended) /sdlc:explore — deepen existing concept`
+- `/sdlc:architect — move on to stack`
+- `Replace concept — overwrite concept.md`
+
+Wait for their choice, then act on it.
 
 If the repo has code and no `README.md`, list the top-level directories and the
 package manifest. That is enough to know what the project is.
@@ -90,7 +94,7 @@ Then end the message with this line, and nothing after it:
 
 > **Approve `concept`?** Reply `yes`, or tell me what to change.
 
-No `Next` block follows the question. See
+Do not call the next-steps menu in the gate turn. See
 [ASKING.md](../status/ASKING.md).
 
 On approval, set `concept` to `approved <today's date>` in `state.md`.
@@ -99,18 +103,15 @@ On a change request, edit the document and ask the same question again.
 
 ## Close
 
-End with the block from [NEXT-STEPS.md](../status/NEXT-STEPS.md). After
-approval it reads:
+Print the `Uncommitted:` reminder when files changed, then invoke the
+interactive next-step menu from [NEXT-STEPS.md](../status/NEXT-STEPS.md):
 
-```
-Next
-  → /sdlc:explore          poke holes in this first
-    /sdlc:architect        go straight to the stack
-```
+- `(Recommended) /sdlc:explore — poke holes in this`
+- `/sdlc:architect — go straight to stack`
 
-Recommend `/sdlc:explore` when the idea is new or the open questions are still
-open. Recommend `/sdlc:architect` when the user has built this kind of thing
-before and the concept is tight.
+Recommend `/sdlc:explore` when the idea is new or open questions remain.
+Recommend `/sdlc:architect` first when the user has built this kind of thing
+before and the concept is already tight.
 
 ## Existing repos
 
@@ -132,7 +133,8 @@ comes first and write that one. Note the others under `## Open questions`.
 
 ## Reference
 
-- [ASKING.md](../status/ASKING.md) — how to ask: one question, last line,
-  nothing after it.
+- [ASKING.md](../status/ASKING.md) — plain-text questions and gates vs.
+  interactive menus.
+- [NEXT-STEPS.md](../status/NEXT-STEPS.md) — the interactive closing menu.
 - [ARTIFACTS.md](../status/ARTIFACTS.md) — the `concept.md` template.
 - [STATE-FORMAT.md](../status/STATE-FORMAT.md) — the state file and its rules.

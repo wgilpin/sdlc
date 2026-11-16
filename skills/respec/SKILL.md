@@ -26,12 +26,24 @@ never writes `state.md`. The old tree stays as history.
 ## Preconditions
 
 Read `docs/sdlc/state.md`. If the file is absent, tell the user this project is
-not in the chain, offer `/sdlc:concept`, and stop.
+not in the chain, then close with the interactive menu from
+[NEXT-STEPS.md](../status/NEXT-STEPS.md) offering
+`(Recommended) /sdlc:concept — get the idea down` and
+`Stop here — do nothing now`.
 
 No stage has to be approved.
 
-If `$ARGUMENTS` is empty, end the message with: **What are we respec'ing — a
-fix, an epic, a phase, or the whole app?** Then stop.
+If `$ARGUMENTS` is empty, ask which scope to respec using the interactive
+question tool from [ASKING.md](../status/ASKING.md) (`ask_question` /
+`AskUserQuestion`, with plain-text fallback):
+
+- `(Recommended) epic — rebuild one epic`
+- `fix — rebuild one behaviour`
+- `phase — rebuild one phase`
+- `all — rebuild the whole app`
+
+If they pick `fix`, `epic`, or `phase` without naming the target via `Other`,
+ask one plain-text follow-up to identify it before continuing.
 
 ## Step 1 — Resolve the scope
 
@@ -232,17 +244,15 @@ The fix template:
 
 ## Close
 
-Print the block from [NEXT-STEPS.md](../status/NEXT-STEPS.md). This skill ends
-the chain's normal flow, so recommend the read, not a build:
+Print the `Uncommitted:` reminder first, then invoke the interactive next-step
+menu from [NEXT-STEPS.md](../status/NEXT-STEPS.md). This skill ends the chain's
+normal flow, so recommend inspecting the state rather than starting a build:
 
-```
-Next
-  → /sdlc:status           see where the old tree stands
-    /sdlc:respec all       widen the rebuild
-```
+- `(Recommended) /sdlc:status — check old tree state`
+- `/sdlc:respec all — widen the rebuild`
 
-Put the uncommitted line above the block, as
-[NEXT-STEPS.md](../status/NEXT-STEPS.md) requires.
+When the scope was already `all`, offer `Stop here — review new spec` as the
+second option instead of `/sdlc:respec all`.
 
 ## What this skill does not do
 
@@ -255,7 +265,9 @@ Put the uncommitted line above the block, as
 
 ## Reference
 
-- [ASKING.md](../status/ASKING.md) — one question, last line, nothing after it.
+- [ASKING.md](../status/ASKING.md) — plain-text questions and gates vs.
+  interactive menus.
+- [NEXT-STEPS.md](../status/NEXT-STEPS.md) — the interactive closing menu.
 - [ARTIFACTS.md](../status/ARTIFACTS.md) — the templates every respec file uses,
   and the `docs/sdlc-v2/` layout.
 - [STATE-FORMAT.md](../status/STATE-FORMAT.md) — the status words this skill

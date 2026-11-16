@@ -11,8 +11,10 @@ Stage 1 got the idea down. This stage tries to break it.
 ## Preconditions
 
 Read `docs/sdlc/state.md`. The `concept` stage must be `in progress` or
-`approved`. If `docs/sdlc/concept.md` is absent, say so and offer
-`/sdlc:concept`. Stop.
+`approved`. If `docs/sdlc/concept.md` is absent, say so and close with the
+interactive menu from [NEXT-STEPS.md](../status/NEXT-STEPS.md) offering
+`(Recommended) /sdlc:concept — get the idea down` and
+`Stop here — do nothing now`.
 
 Read `docs/sdlc/concept.md` in full. Read the repo documents the same way
 `/sdlc:concept` does, if you have not already.
@@ -111,7 +113,7 @@ Then end the message with this line, and nothing after it:
 
 > **Approve `explore`?** Reply `yes`, or tell me what to change.
 
-No `Next` block follows the question. See
+Do not call the next-steps menu in the gate turn. See
 [ASKING.md](../status/ASKING.md).
 
 On approval, set `explore` to `approved <today's date>`.
@@ -121,18 +123,18 @@ back to `in progress` and tell the user why.
 
 ## Close
 
-End with the block from [NEXT-STEPS.md](../status/NEXT-STEPS.md). After
-approval it reads:
+Print the `Uncommitted:` reminder when files changed, then invoke the
+interactive next-step menu from [NEXT-STEPS.md](../status/NEXT-STEPS.md):
 
-```
-Next
-  → /sdlc:architect        decide the stack and the shape
-    /sdlc:concept          rewrite the idea first
-```
+- `(Recommended) /sdlc:architect — decide stack and shape`
+- `/sdlc:concept — rewrite the idea first`
 
-Offer `/sdlc:concept` only when the exploration changed the problem, not only
-the solution. When the exploration killed the idea, make `/sdlc:concept` the
-recommendation and say the notes are worth keeping.
+Offer `/sdlc:concept` when the exploration changed the problem; otherwise offer
+`/sdlc:status — see the whole project` as the second option.
+
+When the exploration killed the idea, say the exploration notes are worth
+keeping, then offer `(Recommended) /sdlc:concept — start a fresh idea` and
+`Stop here — keep exploration notes`.
 
 ## What this skill does not do
 
@@ -145,8 +147,9 @@ recommendation and say the notes are worth keeping.
 
 ## Reference
 
-- [ASKING.md](../status/ASKING.md) — how to ask: one question, last line,
-  nothing after it.
+- [ASKING.md](../status/ASKING.md) — plain-text questions and gates vs.
+  interactive menus.
+- [NEXT-STEPS.md](../status/NEXT-STEPS.md) — the interactive closing menu.
 - [ARTIFACTS.md](../status/ARTIFACTS.md) — the `concept.md` template and the
   three sections this stage adds.
 - [STATE-FORMAT.md](../status/STATE-FORMAT.md) — the state file and its rules.

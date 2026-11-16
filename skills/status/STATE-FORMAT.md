@@ -85,10 +85,11 @@ has passed but still sits on its own branch.
 ## The contract every skill follows
 
 1. Read `docs/sdlc/state.md` first. If the file is absent, only `/sdlc:concept`
-   continues. Every other skill stops and tells the user to run
-   `/sdlc:concept`.
-2. Check the preconditions in the table below. If a stage is missing, name it
-   and stop. Do not guess and do not fill the gap.
+   continues. Every other skill stops and offers `/sdlc:concept` via
+   [NEXT-STEPS.md](NEXT-STEPS.md).
+2. Check the preconditions in the table below. If a stage is missing, name it,
+   offer that stage via [NEXT-STEPS.md](NEXT-STEPS.md), and stop. Do not guess
+   and do not fill the gap.
 3. Do the work. Update `state.md` in the same turn. Set the `Updated:` date.
 
 ## Preconditions

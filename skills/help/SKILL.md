@@ -8,12 +8,13 @@ argument-hint: "[stage name — concept, architect, build-epic] (blank = the who
 
 **Asked about:** $ARGUMENTS
 
-Explain. Then stop.
+Explain, then offer where to go next.
 
 ## What this skill is
 
 A read-only description of the chain. It never reads project files, never
-writes a file, and never starts a stage.
+writes a file, and never starts a stage until the user picks one from the
+closing menu.
 
 Two modes:
 
@@ -87,13 +88,18 @@ Order       Every skill checks its preconditions. If an earlier stage is not
             approved, it names the missing stage and stops. No code before
             stage 6.
 
-Asking      A question is the last line of the message, in bold, and it
-            names the answer: "Reply yes, or tell me what to change."
-            Nothing follows it — no Next block, no summary. One question
-            per message. If there is no question, it is your turn.
+Asking      Open questions, approval gates, and destructive checks end
+            with one bold question on the last line: "Reply yes, or tell
+            me what to change." Nothing follows it. Multi-option branches
+            use the host's interactive question UI.
 
-Close       A message that asks nothing ends with a Next block. The arrow
-            marks the recommendation. You never work out what runs next.
+Close       A message that asks no plain-text question closes with an
+            interactive next-step menu (recommended option first, with a
+            plain-text fallback). Pick an option to run it directly.
+
+Names       /sdlc:<skill> is the Claude Code plugin command. In harnesses
+            without a plugin prefix (like Antigravity), invoke <skill>
+            directly by name.
 ```
 
 ## What it writes
@@ -112,8 +118,8 @@ docs/sdlc/
     phase.md                stage 5: goal, scope, done criteria
     test-plan.md            stage 5: how the phase gets proven
     epic-01-<slug>.md       stage 5 spec, stage 6 build note, stage 7 review
-docs/adr/NNNN-<slug>.md     decisions that are hard to reverse
-docs/sdlc-v2/               /sdlc:respec, a spec to rebuild from scratch
+  docs/adr/NNNN-<slug>.md   decisions that are hard to reverse
+  docs/sdlc-v2/             /sdlc:respec, a spec to rebuild from scratch
 ```
 
 One file per epic. That file holds the spec, the build note, and the review,
@@ -132,27 +138,21 @@ Four to eight lines. Do not paste the skill.
 
 - It does not read `docs/sdlc/state.md`.
 - It does not report a project's position. That is `/sdlc:status`.
-- It does not start a stage.
+- It does not start a stage unless the user clicks one in the closing menu.
 - It does not write a file.
 
 ## Close
 
-Use the block format from [NEXT-STEPS.md](../status/NEXT-STEPS.md), with one
-change: pick the recommendation from the user's question, not from a state
-file, because this skill does not read state.
+Invoke the interactive next-step menu from
+[NEXT-STEPS.md](../status/NEXT-STEPS.md), picking the recommendation from the
+user's question rather than reading a state file:
 
-New project, or the user asked what to do first:
+New project, or the user asked where to start:
 
-```
-Next
-  → /sdlc:concept          get the idea down
-    /sdlc:status           check an existing project
-```
+- `(Recommended) /sdlc:concept — get the idea down`
+- `/sdlc:status — check existing project`
 
-Existing project:
+Existing project, or general overview:
 
-```
-Next
-  → /sdlc:status           see where this project is
-    /sdlc:help concept     read one stage in detail
-```
+- `(Recommended) /sdlc:status — see project position`
+- `/sdlc:help concept — inspect one stage`

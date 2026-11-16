@@ -6,20 +6,23 @@ argument-hint: "(none)"
 
 # Status: where the chain is
 
-Report the position. Then stop.
+Report the position, then offer what runs next.
 
 ## What this skill is
 
 A read-only report. It answers one question: what runs next?
 
-It never edits a file. It never starts the next stage.
+It never edits a file, and it never starts a stage until the user selects one
+from the closing menu.
 
 ## Steps
 
 1. Read `docs/sdlc/state.md`.
 2. If the file is absent, check whether `docs/sdlc/` exists.
-   - No folder: tell the user this project is not in the chain. Offer
-     `/sdlc:concept`. Stop.
+   - No folder: tell the user this project is not in the chain, then close with
+     the interactive menu from [NEXT-STEPS.md](NEXT-STEPS.md) offering
+     `(Recommended) /sdlc:concept — get the idea down` and
+     `Stop here — do nothing now`.
    - Folder but no `state.md`: tell the user the state file is missing, then
      end the message with: **Rebuild `state.md` from the files present?** Reply
      `yes`, or `no`. Never write it without an answer.
@@ -49,8 +52,6 @@ Progress   8/14 epics reviewed · phase 2 of 5
   03-auth        pending       not planned
   04-export      pending       not planned
   05-polish      pending       not planned
-
-Next: /sdlc:build-epic 06
 ```
 
 Rules for the progress block:
@@ -66,22 +67,19 @@ Rules for the progress block:
 
 ## Close
 
-Replace the `Next:` line above with the block from
-[NEXT-STEPS.md](../status/NEXT-STEPS.md):
+Close with the interactive next-step menu from [NEXT-STEPS.md](NEXT-STEPS.md),
+using its routing table to pick the `(Recommended)` option — for example:
 
-```
-Next
-  → /sdlc:build-epic 06    build the last epic
-    /sdlc:plan-phase 03    plan the next phase early
-```
+- `(Recommended) /sdlc:build-epic 06 — build the last epic`
+- `/sdlc:plan-phase 03 — plan next phase early`
 
-Use the routing table in that file to pick the recommendation. If any epic is
-`blocked`, put it on its own line above the block and make it the
-recommendation.
+If any epic is `blocked`, call it out on its own line under the report before
+invoking the tool and make unblocking it the `(Recommended)` option.
 
-When the state and the files disagree, say so in one line under the report.
-Example: `Note: phases.md exists but the phases stage is pending.` Do not fix
-it yourself.
+When the state and the files disagree, say so in one line under the report
+before invoking the tool. Example:
+`Note: phases.md exists but the phases stage is pending.` Do not fix it
+yourself.
 
 ## Rebuilding a lost state file
 
@@ -93,15 +91,18 @@ Use the template in [STATE-FORMAT.md](STATE-FORMAT.md).
 
 ## What this skill does not do
 
-- It does not run the next stage.
+- It does not start the next stage unless the user clicks it in the closing
+  menu.
 - It does not approve a stage.
 - It does not edit `state.md`, unless the user asks it to rebuild the file.
 - It does not read source code.
 
 ## Reference
 
-- [ASKING.md](ASKING.md) — how to ask: one question, last line, nothing after
-  it.
+- [ASKING.md](ASKING.md) — plain-text questions vs. interactive multi-option
+  menus.
+- [NEXT-STEPS.md](NEXT-STEPS.md) — the interactive closing menu and routing
+  table.
 - [STATE-FORMAT.md](STATE-FORMAT.md) — the state file, its status words, the
   precondition table, and the backtracking rule.
 - [ARTIFACTS.md](ARTIFACTS.md) — every file the chain writes, and its template.

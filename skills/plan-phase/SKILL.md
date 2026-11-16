@@ -197,7 +197,8 @@ line, and nothing after it:
 
 > **Approve `phase NN`?** Reply `yes`, or tell me what to change.
 
-No `Next` block follows any question. See [ASKING.md](../status/ASKING.md).
+Do not call the next-steps menu in any question or gate turn. See
+[ASKING.md](../status/ASKING.md).
 
 ## Land the plan
 
@@ -257,23 +258,23 @@ Run this section only after a clear `yes` when working on
 
 ## Close
 
-End with the block from [NEXT-STEPS.md](../status/NEXT-STEPS.md). After
-approval it reads:
+Invoke the interactive next-step menu from
+[NEXT-STEPS.md](../status/NEXT-STEPS.md):
 
-```
-Next
-  → /sdlc:build-epic 01    build the tracer bullet
-    /sdlc:phases           the phase is too big
-```
+- `(Recommended) /sdlc:build-epic 01 — build the tracer bullet`
+- `/sdlc:loop-phase 01 — build and land phase`
+- `/sdlc:phases — phase is too big`
 
-Name the epic number. Recommend the first epic that is not `reviewed`.
+Name the epic number. Recommend the first epic that is not `reviewed`. Omit
+`/sdlc:phases` when the slice sizes look right.
 
-When two epics are independent, name both and say either one can go first.
+When two epics are independent, include both in the options and note that either
+can go first.
 
 When the plan landed on `<default>`, omit the `Uncommitted:` reminder because
-the plan is committed. Print `Uncommitted:` only when there was no git
-repository or `HEAD` commit (or when a dirty main tree kept the plan on
-`plan/phase-NN-<slug>`).
+the plan is committed. Print `Uncommitted:` right before calling the tool only
+when there was no git repository or `HEAD` commit (or when a dirty main tree
+kept the plan on `plan/phase-NN-<slug>`).
 
 ## What this skill does not do
 
@@ -287,8 +288,9 @@ repository or `HEAD` commit (or when a dirty main tree kept the plan on
 
 ## Reference
 
-- [ASKING.md](../status/ASKING.md) — how to ask: one question, last line,
-  nothing after it.
+- [ASKING.md](../status/ASKING.md) — plain-text questions and gates vs.
+  interactive menus.
+- [NEXT-STEPS.md](../status/NEXT-STEPS.md) — the interactive closing menu.
 - [ARTIFACTS.md](../status/ARTIFACTS.md) — the `phase.md`, `test-plan.md`, and
   epic file templates.
 - [STATE-FORMAT.md](../status/STATE-FORMAT.md) — the state file and its rules.
