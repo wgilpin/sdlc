@@ -29,7 +29,7 @@ pollute the main working tree or active builds.
 1. **Check for a repository with commits.** Run
    `git rev-parse --is-inside-work-tree` and `git rev-parse --verify HEAD`. If
    either fails, plan directly in the working tree without a branch and skip
-   `## Land the plan` at the end.
+   `## Merge the plan` at the end.
 2. **Find the default branch.** Read
    `git symbolic-ref --quiet refs/remotes/origin/HEAD`. When there is no
    remote, use `main` if it exists, else `master`.
@@ -186,21 +186,21 @@ branch for each gap, one question per message, until no unresolved gaps remain.
 **When no unresolved gaps remain (on a plan branch):** End the message with
 these two blocks and nothing after them:
 
-> WARNING: Approval commits `docs/sdlc/phase-NN-<slug>/` and `state.md` and
-> merges `plan/phase-NN-<slug>` into `<default>`.
+> WARNING: Approval commits the plan docs (`docs/sdlc/phase-NN-<slug>/` and
+> `state.md`) and merges `plan/phase-NN-<slug>` into `<default>` locally.
 >
-> **Approve and land `phase NN`?** Reply `yes` to commit and merge the plan, or
-> tell me what to change.
+> **Approve and merge the `phase NN` plan?** Reply `yes` to commit and merge the
+> plan docs, or tell me what to change.
 
 **When there is no git commit yet (no plan branch):** End the message with this
 line, and nothing after it:
 
-> **Approve `phase NN`?** Reply `yes`, or tell me what to change.
+> **Approve the `phase NN` plan?** Reply `yes`, or tell me what to change.
 
 Do not call the next-steps menu in any question or gate turn. See
 [ASKING.md](../status/ASKING.md).
 
-## Land the plan
+## Merge the plan
 
 Run this section only after a clear `yes` when working on
 `plan/phase-NN-<slug>`. If there is no git repository or `HEAD` commit, skip to
@@ -271,7 +271,7 @@ Name the epic number. Recommend the first epic that is not `reviewed`. Omit
 When two epics are independent, include both in the options and note that either
 can go first.
 
-When the plan landed on `<default>`, omit the `Uncommitted:` reminder because
+When the plan merged into `<default>`, omit the `Uncommitted:` reminder because
 the plan is committed. Print `Uncommitted:` right before calling the tool only
 when there was no git repository or `HEAD` commit (or when a dirty main tree
 kept the plan on `plan/phase-NN-<slug>`).

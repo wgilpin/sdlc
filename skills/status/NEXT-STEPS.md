@@ -158,5 +158,5 @@ Uncommitted: 4 files changed. Commit before you continue.
 
 For a code change on an epic branch, recommend `/sdlc:push-epic` instead of a
 manual commit once the epic is `reviewed`. Stages 1 to 4 change documents, which
-the user commits (or commits automatically if they later land `plan-phase` in
+the user commits (or commits automatically if they later merge a phase plan in
 in-place mode).

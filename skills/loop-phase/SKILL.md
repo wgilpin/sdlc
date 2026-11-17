@@ -69,9 +69,9 @@ plan, and the files under `docs/sdlc/phase-NN-<slug>/`. Update `state.md`.
 
 Two changes:
 
-- **Its gate and landing wait.** Do not run `plan-phase`'s gate or
-  `## Land the plan` yet. Step 2's loop gate covers approval, and Step 3 lands
-  the plan onto `<default>` once the user replies `yes`.
+- **Its gate and merge wait.** Do not run `plan-phase`'s gate or
+  `## Merge the plan` yet. Step 2's loop gate covers approval, and Step 3 merges
+  the plan into `<default>` once the user replies `yes`.
 - **A gap does not ask.** `plan-phase` normally asks how to prove an uncovered
   done criterion. Here, list every gap above the loop gate instead. The user
   sees the holes and decides with one answer. Do not invent a test to close a
@@ -81,7 +81,7 @@ Two changes:
 and epics in `state.md` means a run stopped earlier. Say so, say which epics
 are left, and go to the gate with the remaining epics only. If an unmerged
 `plan/phase-NN-<slug>` branch or worktree exists from an earlier interrupted
-run, reuse it and land it in Step 3 after the gate.
+run, reuse it and merge it in Step 3 after the gate.
 
 ## Step 2 — The one gate
 
@@ -118,8 +118,8 @@ and the draft remains in `.worktrees/plan-phase-NN-<slug>`.
 
 ## Step 3 — The loop
 
-0. **Land the plan first, if drafted in Step 1.** When Step 1 created or reused
-   `plan/phase-NN-<slug>`, run `## Land the plan` from
+0. **Merge the plan first, if drafted in Step 1.** When Step 1 created or reused
+   `plan/phase-NN-<slug>`, run `## Merge the plan` from
    [plan-phase](../plan-phase/SKILL.md) before cutting `epic-01` so
    `docs/sdlc/phase-NN-<slug>/` and `state.md` are committed on `<default>`.
 
