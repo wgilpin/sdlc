@@ -126,9 +126,11 @@ and the draft remains in `.worktrees/plan-phase-NN-<slug>`.
 For each epic, in build order:
 
 1. **Build, in a subagent.** Cut the branch from the default branch yourself.
-   Then launch one build subagent via `invoke_subagent` (`TypeName: "self"`) and
-   stop calling tools until it reports — the loop needs its result before the
-   review. See [The build agent](#the-build-agent).
+   Then launch one build subagent via `invoke_subagent` using
+   `TypeName: "sdlc-builder"` when registered in the session (falling back to
+   `TypeName: "self"` if `sdlc-builder` is unavailable, e.g. on other hosts)
+   with `Workspace: "inherit"`, and stop calling tools until it reports — the
+   loop needs its result before the review. See [The build agent](#the-build-agent).
 2. **Review.** Do [review](../review/SKILL.md) in full, from the main context.
    Its passes 1 and 2 run in their own agents. Pass the build agent's reported
    `suite` command and summary output to Pass 1 so it skips a redundant full
@@ -247,7 +249,8 @@ A `fail` is the one place the loop repairs itself. `/sdlc:review` recommends
 
 1. Say which acceptance criterion failed.
 2. Build again, on the same branch, against that criterion only. Use a fresh
-   build agent. Add the failed criterion and the review block to its prompt.
+   build agent (`sdlc-builder`, or `self` fallback). Add the failed criterion
+   and the review block to its prompt.
 3. Review again.
 
 A second `fail` on the same epic stops the run. Two failures mean the spec and
