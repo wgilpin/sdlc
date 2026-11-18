@@ -28,7 +28,7 @@ neither.
 | `/sdlc:phases` | 4 | Breaks the work into shippable phases, with you. |
 | `/sdlc:plan-phase` | 5 | Turns one phase into epics and a test plan. |
 | `/sdlc:build-epic` | 6 | Runs one epic red-green-refactor to green, on its own branch. |
-| `/sdlc:review` | 7 | Checks the diff against the epic, the concept, and the architecture. |
+| `/sdlc:review` | 7 | Checks the diff against the epic, concept, architecture, and security rules. |
 | `/sdlc:push-epic` | 8 | Commits, pushes, merges into the default branch, pulls. |
 | `/sdlc:loop-phase` | 5–8 | Runs a whole phase in one go. One gate, then no stops. |
 | `/sdlc:issue` | — | Routes one issue: fix it now, or into the epic or phase that owns it. |
@@ -90,6 +90,7 @@ docs/sdlc/
   concept.md                stage 1, deepened by stage 2
   architecture.md           stage 3, records the stack
   design.md                 stage 3b, tokens and surfaces, UI projects only
+  design-kit/               stage 3b, component kit, Claude Design push only
   phases.md                 stage 4, the ordered phase list
   issues.md                 /sdlc:issue, the record of every issue raised
   phase-01-<slug>/
@@ -98,6 +99,7 @@ docs/sdlc/
     epic-01-<slug>.md       stage 5 spec, stage 6 build note, stage 7 review
 docs/adr/NNNN-<slug>.md     decisions that are hard to reverse
 docs/sdlc-v2/               /sdlc:respec, a spec to rebuild from scratch
+AGENTS.md / CLAUDE.md       repo-wide invariants promoted when an epic lands
 ```
 
 One file per epic. That file holds the spec, the build note, and the review, in
@@ -106,15 +108,20 @@ the same file it writes to.
 
 ## How the stages connect
 
-Every skill does the same three things:
+Every stage skill does the same three things:
 
 1. It reads `docs/sdlc/state.md`.
 2. It checks its preconditions. If an earlier stage is not approved, it names
    the missing stage and stops.
 3. It does the work, then updates `state.md` in the same turn.
 
-Stages 1 to 5 end with the same question: **"Approve `<stage>`? Reply `yes`, or
-tell me what to change."** Nothing advances until you answer.
+(`/sdlc:status` and `/sdlc:respec` read `state.md` without changing it;
+`/sdlc:help` reads no project files.)
+
+Stages 1 to 4 end with **Approve `<stage>`?** Reply `yes`, or tell me what to
+change. Stage 5 ends with **Approve and merge the `phase NN` plan?** Reply `yes`
+to commit and merge the plan docs, or tell me what to change (or **Approve the
+`phase NN` plan?** before the first commit). Nothing advances until you answer.
 
 Stage 6 is different. It confirms the task list once, then runs to green
 without a stop.
@@ -129,7 +136,8 @@ not the builder.
 It asks three things before it starts — a repository, a clean working tree, a
 green suite — and then one gate that shows the epics and warns that the run
 commits, pushes, and merges. That yes is the permission for every git write in
-the run. It covers that phase only.
+the run (including promoting confirmed repo-wide invariants from build notes
+into `AGENTS.md` or `CLAUDE.md`). It covers that phase only.
 
 After the yes it takes its own recommendation at every step. It stops only when
 a rule forces it: a stuck test, a review that fails twice on one epic, a merge
@@ -164,16 +172,17 @@ Every turn ends in one of two ways, so you never wonder whose turn it is:
 
 **Plain-text questions and gates end on a bold last line.** Interview
 questions, `Approve <stage>?` gates, and destructive confirmations sit on the
-last line of the message, in bold, naming the answer you can give. Nothing
-follows the question — no summary, no closing note, and no next-step menu. One
-question per message; a skill with three offers asks across three messages. See
-`skills/status/ASKING.md`.
+last line of the message, with the question in bold followed by the answer you
+can give. Nothing follows that line — no summary, no closing note, and no
+next-step menu. One question per message; a skill with three offers asks across
+three messages. See `skills/status/ASKING.md`.
 
-**Non-question turns close with an interactive next-step menu.** When a stage
-finishes or reports without a plain-text question, it invokes the host's
-multiple-choice question tool (`ask_question` in Antigravity /
-`AskUserQuestion` in Claude Code, with a plain-text fallback if neither is
-available):
+**Multi-option choices and non-question turns use an interactive menu.** For
+3+ option routing choices (such as `respec` scope selection or dirty-tree
+triage) and at the close of every turn that asks no plain-text question, the
+skill invokes the host's multiple-choice question tool (`ask_question` in
+Antigravity / `AskUserQuestion` in Claude Code, with a plain-text fallback if
+neither is available):
 
 - `(Recommended) /sdlc:build-epic 06 — build the last epic`
 - `/sdlc:status — see the whole project`
@@ -190,6 +199,8 @@ skill never offers a step whose preconditions are not met. See
   leave changes in the working tree.
 - It never force pushes and never rewrites history.
 - It never lands an epic that failed review.
+- It never stages `.env*` files, private keys, local databases, or hard-coded
+  secrets.
 - It never runs `docker` or migration commands without a question first.
 - It never writes code before stage 6.
 - It never deletes a document. `/sdlc:respec` writes a new tree beside the old
